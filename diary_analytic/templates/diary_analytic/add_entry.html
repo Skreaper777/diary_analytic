@@ -141,24 +141,32 @@
 </head>
 <body>
   <div class="container">
-    <h2>📘 Дневник состояния на {{ selected_date }}</h2>
+    <h2>📘 Дневник состояния — {{ selected_date }}</h2>
 
-    <!-- 📝 Форма комментария -->
+    <div class="date-selector">
+      <input
+        id="date-input"
+        type="date"
+        value="{{ selected_date }}"
+        onchange="window.location.href='?date='+encodeURIComponent(this.value)"
+      />
+    </div>
+
+    <!-- Комментарий -->
     <form method="post">
       {% csrf_token %}
       {{ form.as_p }}
       <button type="submit">💾 Сохранить комментарий</button>
     </form>
 
-    <!-- 📊 Параметры -->
+    <!-- Параметры -->
     {% for param in parameters %}
       <div class="parameter-block" data-key="{{ param.key }}">
         <div class="param-title">{{ param.name }}</div>
-
         <div class="rating-buttons">
-          {% for i in "0"|make_list|stringformat:"s"|add:"1"|make_list|stringformat:"s"|add:"2"|make_list|stringformat:"s"|add:"3"|make_list|stringformat:"s"|add:"4"|make_list|stringformat:"s"|add:"5" %}
+          {% for i in "0"|make_list:" "|add:"1"|make_list:" "|add:"2"|make_list:" "|add:"3"|make_list:" "|add:"4"|make_list:" "|add:"5" %}
             {% with val=i|stringformat:"d" %}
-              {% if values_map[param.key] == val|add:""|float %}
+              {% if values_map[param.key] == val|float %}
                 <button class="value-button selected" data-value="{{ val }}">{{ val }}</button>
               {% else %}
                 <button class="value-button" data-value="{{ val }}">{{ val }}</button>
@@ -167,18 +175,23 @@
           {% endfor %}
         </div>
 
-        <!-- Плейсхолдер под прогнозы -->
+        <!-- Прогнозы будут позже -->
         <div class="prediction-wrapper">
-          <div class="prediction-block" data-param="{{ param.key }}">
-            <div class="prediction-title">База</div>
-            <div class="predicted" id="predicted-{{ param.key }}">–</div>
-            <div class="predicted-secondary" id="predicted-delta-{{ param.key }}">Δ –</div>
+          <div class="prediction-block">
+            <div class="prediction-title">Прогноз 1</div>
+            <div class="predicted">–</div>
+            <div class="predicted-secondary">Δ –</div>
+          </div>
+          <div class="prediction-block">
+            <div class="prediction-title">Прогноз 2</div>
+            <div class="predicted">–</div>
+            <div class="predicted-secondary">Δ –</div>
           </div>
         </div>
       </div>
     {% endfor %}
   </div>
 
-  <script src="{% static 'diary_analytic/js/diary.js' %}"></script>
+  <script src="{% static 'diary/js/diary.js' %}"></script>
 </body>
 </html>

@@ -2,11 +2,13 @@
 
 from datetime import datetime
 from django.shortcuts import render
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse 
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from .models import Entry, Parameter, EntryValue
 from .forms import EntryForm
 from .utils import get_diary_dataframe
-from .loggers import web_logger
+from .loggers import web_logger, db_logger, predict_logger
 
 
 # --------------------------------------------------------------------
@@ -101,3 +103,162 @@ def add_entry(request: HttpRequest) -> HttpResponse:
         "selected_date": selected_date,       # Дата, для которой загружается дневник
         "today_str": today_str,               # Строка сегодняшней даты (для сравнения в шаблоне)
     })
+
+
+# --------------------------------------------------------------------
+# 🔘 AJAX: обновление значения параметра (клик по кнопке)
+# --------------------------------------------------------------------
+
+@csrf_exempt  # отключаем CSRF (используем ручную защиту через заголовок в JS)
+@require_POST  # разрешаем только POST-запросы
+def update_value(request):
+    """
+    Обрабатывает запрос на обновление одного значения параметра.
+
+    📥 Вход: JSON-объект, отправленный через JS:
+        {
+            "parameter": "toshn",
+            "value": 2,
+            "date": "2025-05-12"
+        }
+
+    🧠 Обработка:
+    - находит или создаёт Entry на указанную дату
+    - находит Parameter по ключу
+    - обновляет или создаёт EntryValue
+    - логирует результат
+
+    📤 Ответ:
+    - {"success": true} — при успехе
+    - {"error": "..."} — при ошибке
+    """
+
+    try:
+        # --------------------------
+        # 🔓 1. Распаковываем JSON
+        # --------------------------
+        data = json.loads(request.body)
+
+        param_key = data.get("parameter")    # ключ параметра, например: "ustalost"
+        value = data.get("value")            # значение от 0 до 5
+        date_str = data.get("date")          # дата в строке, например: "2025-05-12"
+
+        if not param_key or value is None or not date_str:
+            db_logger.warning("⚠️ Не хватает обязательных полей в теле запроса")
+            return JsonResponse({"error": "missing fields"}, status=400)
+
+        # --------------------------
+        # 🕓 2. Преобразуем дату
+        # --------------------------
+        try:
+            entry_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            db_logger.warning(f"⚠️ Некорректный формат даты: {date_str}")
+            return JsonResponse({"error": "invalid date"}, status=400)
+
+        # --------------------------
+        # 📅 3. Получаем или создаём Entry на эту дату
+        # --------------------------
+        entry, _ = Entry.objects.get_or_create(date=entry_date)
+
+        # --------------------------
+        # 📌 4. Находим параметр по ключу
+        # --------------------------
+        try:
+            parameter = Parameter.objects.get(key=param_key)
+        except Parameter.DoesNotExist:
+            db_logger.error(f"❌ Параметр не найден: '{param_key}'")
+            return JsonResponse({"error": "invalid parameter"}, status=400)
+
+        # --------------------------
+        # 💾 5. Обновляем или создаём EntryValue
+        # --------------------------
+        ev, created = EntryValue.objects.update_or_create(
+            entry=entry,
+            parameter=parameter,
+            defaults={"value": float(value)}
+        )
+
+        # --------------------------
+        # 📜 6. Логируем результат
+        # --------------------------
+        action = "Создан" if created else "Обновлён"
+        db_logger.info(f"✅ {action} EntryValue: {param_key} = {value} ({entry_date})")
+
+        # --------------------------
+        # 📤 7. Возвращаем успех
+        # --------------------------
+        return JsonResponse({"success": True})
+
+    except Exception as e:
+        # 🔥 В случае любой ошибки — лог + JSON-ответ 500
+        db_logger.exception(f"🔥 Ошибка в update_value: {str(e)}")
+        return JsonResponse({"error": "internal error"}, status=500)
+    
+@require_GET
+def predict(request):
+    """
+    Выполняет прогнозы по всем активным параметрам на указанную дату.
+
+    🔍 GET-параметры:
+        ?date=2025-05-12
+
+    📦 Ответ:
+        {
+            "ustalost_base": 3.4,
+            "toshn_base": 1.2,
+            ...
+        }
+
+    Прогноз строится через стратегию "base" (линейная модель).
+    """
+
+    try:
+        date_str = request.GET.get("date")
+        if not date_str:
+            return JsonResponse({"error": "missing date"}, status=400)
+
+        try:
+            selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            return JsonResponse({"error": "invalid date"}, status=400)
+
+        # Получаем полный DataFrame
+        df = get_diary_dataframe()
+
+        if df.empty:
+            return JsonResponse({}, status=200)  # нет данных → нет прогнозов
+
+        # Получаем значения за выбранную дату (частично заполненные)
+        today_row = get_today_row(selected_date)
+        manager = PredictorManager()
+        result = {}
+
+        # Перебираем все активные параметры
+        for param in Parameter.objects.filter(is_active=True):
+            key = param.key
+
+            if key not in df.columns:
+                continue  # нет истории для этого параметра
+
+            # Исключаем сам параметр из признаков
+            exclude = [key]
+            try:
+                model = manager.train(strategy="base", df=df, target=key, exclude=exclude)
+                prediction = manager.predict_today(strategy="base", model=model, today_row=today_row)
+
+                if prediction is not None:
+                    result[f"{key}_base"] = round(prediction, 2)
+
+                    predict_logger.debug(
+                        f"[predict] ✅ Прогноз для {key}: {prediction:.2f}"
+                    )
+
+            except Exception as e:
+                predict_logger.exception(f"[predict] ❌ Ошибка для {key}: {str(e)}")
+
+        return JsonResponse(result)
+
+    except Exception as e:
+        predict_logger.exception(f"🔥 Ошибка в общей логике /predict/: {str(e)}")
+        return JsonResponse({"error": "internal error"}, status=500)
