@@ -16,8 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.shortcuts import redirect
+from datetime import date
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # ⬇️ 👇 редирект с корня "/" на /add/?date=YYYY-MM-DD
+    path("", lambda request: redirect(f"/add/?date={date.today().isoformat()}")),
+
     path("", include("diary_analytic.urls")),
 ]

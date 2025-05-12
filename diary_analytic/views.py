@@ -4,7 +4,7 @@ from datetime import datetime
 from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse, JsonResponse 
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from .models import Entry, Parameter, EntryValue
 from .forms import EntryForm
 from .utils import get_diary_dataframe
