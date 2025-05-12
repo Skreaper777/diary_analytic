@@ -166,7 +166,7 @@
         <div class="param-title">{{ param.name }}</div>
         <div class="rating-buttons">
           {% for i in "012345"|make_list %}
-            {% with val=i|stringformat:"d" %}
+            {% with val=i %}
               {% if values_map|get:param.key == val|float %}
                 <button class="value-button selected" data-value="{{ val }}">{{ val }}</button>
               {% else %}
@@ -193,6 +193,6 @@
     {% endfor %}
   </div>
 
-  <script src="{% static 'diary/js/diary.js' %}"></script>
+  <script src="{% static 'js/diary.js' %}"></script>
 </body>
 </html>
