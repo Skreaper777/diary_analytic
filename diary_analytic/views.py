@@ -7,7 +7,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
 from .models import Entry, Parameter, EntryValue
 from .forms import EntryForm
-from .utils import get_diary_dataframe
+from .utils import get_diary_dataframe, get_today_row
+from .predictor_manager import PredictorManager
 from .loggers import web_logger, db_logger, predict_logger
 
 
@@ -70,11 +71,20 @@ def add_entry(request: HttpRequest) -> HttpResponse:
     # 📈 5. Загружаем текущие значения параметров за день (если есть)
     # ----------------------------------------------------------------
     entry_values = EntryValue.objects.filter(entry=entry).select_related("parameter")
+    web_logger.debug(f"[add_entry] 🔍 SQL запрос: {entry_values.query}")
+    
     values_map = {
         v.parameter.key: v.value
         for v in entry_values
     }
-    web_logger.debug(f"[add_entry] 📊 Загружено параметров для Entry: {len(values_map)} — {values_map}")
+    web_logger.debug(f"[add_entry] 📊 Загружено параметров для Entry: {len(values_map)}")
+    for key, value in values_map.items():
+        web_logger.debug(f"[add_entry] 📌 Параметр {key}: значение {value} (тип: {type(value)})")
+    
+    # Проверяем все активные параметры
+    for param in parameters:
+        if param.key not in values_map:
+            web_logger.debug(f"[add_entry] ⚠️ Параметр {param.key} не имеет значения в базе")
 
     # ----------------------------------------------------------------
     # 💬 6. Обработка POST-запроса (обновление комментария)

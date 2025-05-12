@@ -22,7 +22,9 @@ def get(dictionary, key):
     Это безопасная альтернатива прямому доступу к словарю через квадратные скобки,
     так как метод .get() не вызовет исключение, если ключ отсутствует в словаре.
     """
-    return dictionary.get(key)
+    value = dictionary.get(key)
+    print(f"🔍 Фильтр get: key={key}, value={value}, type={type(value)}")
+    return value
 
 @register.filter
 def float(value):

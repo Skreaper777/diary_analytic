@@ -1,7 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
+    console.log("🔄 Инициализация страницы...");
+    
     // Получаем дату из input
     const dateInput = document.getElementById("date-input");
     const dateValue = dateInput ? dateInput.value : "";
+    console.log("📅 Выбранная дата:", dateValue);
   
     // Все блоки параметров
     const parameterBlocks = document.querySelectorAll(".parameter-block");
@@ -9,7 +12,16 @@ document.addEventListener("DOMContentLoaded", function () {
     parameterBlocks.forEach((block) => {
       const paramKey = block.getAttribute("data-key");
       const buttons = block.querySelectorAll(".value-button");
-  
+      
+      // Логируем все кнопки и их значения
+      console.log(`\n📊 Параметр ${paramKey}:`);
+      buttons.forEach((btn) => {
+        const value = btn.getAttribute("data-value");
+        const isSelected = btn.classList.contains("selected");
+        console.log(`  - Кнопка ${value}: ${isSelected ? '✅ выбрана' : '❌ не выбрана'}`);
+      });
+
+      // Инициализация выбранных кнопок
       buttons.forEach((btn) => {
         btn.addEventListener("click", async function () {
           const selectedValue = parseInt(this.getAttribute("data-value"));
@@ -45,8 +57,15 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
 
-    // ✅ Вызываем загрузку прогнозов после инициализации кнопок
-  loadPredictions();
+    // Инициализируем выбранные значения
+    parameterBlocks.forEach(block => {
+        const key = block.dataset.key;
+        const selectedButton = block.querySelector('.value-button.selected');
+        console.log(`📊 Параметр ${key}:`, selectedButton ? `выбрано значение ${selectedButton.dataset.value}` : 'нет выбранного значения');
+    });
+
+    // Загружаем прогнозы
+    loadPredictions();
   });
   
   // 🔐 Получение CSRF-токена из cookie

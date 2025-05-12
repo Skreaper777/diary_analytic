@@ -67,9 +67,12 @@ def setup_logger(name: str, logfile: str) -> logging.Logger:
 
 # 📘 WEB: маршруты, переходы, загрузка страниц, GET/POST параметры
 web_logger = setup_logger("web", "web.log")
+web_logger.info("🚀 Инициализирован web-логгер")
 
 # 📊 ML: вызов моделей, стратегия прогнозов, объяснения, ошибки моделей
 predict_logger = setup_logger("predict", "predict.log")
+predict_logger.info("🚀 Инициализирован predict-логгер")
 
 # 🗃️ БД: сохранение и удаление Entry, EntryValue, Parameter
 db_logger = setup_logger("db", "db.log")
+db_logger.info("🚀 Инициализирован db-логгер")

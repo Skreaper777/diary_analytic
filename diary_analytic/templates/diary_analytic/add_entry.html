@@ -1,5 +1,6 @@
 {% load static %}
 {% load diary_filters %}
+{% load diary_tags %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -148,7 +149,7 @@
       <input
         id="date-input"
         type="date"
-        value="{{ selected_date }}"
+        value="{{ selected_date|date:'Y-m-d' }}"
         onchange="window.location.href='?date='+encodeURIComponent(this.value)"
       />
     </div>
@@ -166,13 +167,7 @@
         <div class="param-title">{{ param.name }}</div>
         <div class="rating-buttons">
           {% for i in "012345"|make_list %}
-            {% with val=i %}
-              {% if values_map|get:param.key == val|float %}
-                <button class="value-button selected" data-value="{{ val }}">{{ val }}</button>
-              {% else %}
-                <button class="value-button" data-value="{{ val }}">{{ val }}</button>
-              {% endif %}
-            {% endwith %}
+            <button class="value-button{% if values_map|get:param.key == i %} selected{% endif %}" data-value="{{ i }}">{{ i }}</button>
           {% endfor %}
         </div>
 
