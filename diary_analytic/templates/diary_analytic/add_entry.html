@@ -7,6 +7,9 @@
   <meta charset="UTF-8" />
   <title>Форма дневника состояния</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>
+    window.VALUES_MAP = {{ values_map|safe }};
+  </script>
   <style>
     body {
       font-family: sans-serif;
@@ -167,7 +170,7 @@
         <div class="param-title">{{ param.name }}</div>
         <div class="rating-buttons">
           {% for i in "012345"|make_list %}
-            <button class="value-button{% if values_map|get:param.key == i %} selected{% endif %}" data-value="{{ i }}">{{ i }}</button>
+            <button class="value-button{% if values_map|get:param.key|stringformat:'g' == i %} selected{% endif %}" data-value="{{ i }}">{{ i }}</button>
           {% endfor %}
         </div>
 

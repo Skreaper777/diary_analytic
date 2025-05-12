@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("🔄 Инициализация страницы...");
+    console.log("📦 Значения из бэкенда:", window.VALUES_MAP);
     
     // Получаем дату из input
     const dateInput = document.getElementById("date-input");
@@ -15,6 +16,8 @@ document.addEventListener("DOMContentLoaded", function () {
       
       // Логируем все кнопки и их значения
       console.log(`\n📊 Параметр ${paramKey}:`);
+      console.log(`  🔍 Значение из бэкенда:`, window.VALUES_MAP[paramKey]);
+      
       buttons.forEach((btn) => {
         const value = btn.getAttribute("data-value");
         const isSelected = btn.classList.contains("selected");
