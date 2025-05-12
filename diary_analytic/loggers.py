@@ -52,6 +52,12 @@ def setup_logger(name: str, logfile: str) -> logging.Logger:
     # Привязываем обработчик к логгеру
     logger.addHandler(handler)
 
+    # Отключаем буферизацию на уровне логгера
+    logger.propagate = False
+
+    # Принудительно сбрасываем буфер после каждой записи
+    handler.flush = lambda: handler.stream.flush()
+
     # Возвращаем готовый логгер
     return logger
 
