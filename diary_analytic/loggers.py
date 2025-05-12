@@ -2,6 +2,7 @@
 
 import logging
 import os
+from datetime import datetime
 
 # -------------------------------------------------------------------
 # 📁 Каталог для логов
@@ -76,3 +77,29 @@ predict_logger.info("🚀 Инициализирован predict-логгер")
 # 🗃️ БД: сохранение и удаление Entry, EntryValue, Parameter
 db_logger = setup_logger("db", "db.log")
 db_logger.info("🚀 Инициализирован db-логгер")
+
+# Создаем логгер для ошибок
+error_logger = logging.getLogger("error")
+error_logger.setLevel(logging.ERROR)
+error_handler = logging.FileHandler(os.path.join(LOG_DIR, "error.log"), encoding="utf-8")
+error_handler.setFormatter(logging.Formatter("[%(asctime)s] [%(name)s] [%(funcName)s] — %(message)s"))
+error_logger.addHandler(error_handler)
+
+# Функция для перенаправления ошибок в error.log
+def log_error(logger_name, error_msg, exc_info=None):
+    error_logger.error(f"[{logger_name}] {error_msg}", exc_info=exc_info)
+
+# Настраиваем перенаправление ошибок для всех логгеров
+for logger in [web_logger, predict_logger, db_logger]:
+    class ErrorHandler(logging.Handler):
+        def emit(self, record):
+            if record.levelno >= logging.ERROR:
+                log_error(record.name, record.getMessage(), record.exc_info)
+    
+    logger.addHandler(ErrorHandler())
+
+# Логируем инициализацию
+web_logger.info("🚀 Инициализирован web-логгер")
+predict_logger.info("🚀 Инициализирован predict-логгер")
+db_logger.info("🚀 Инициализирован db-логгер")
+error_logger.info("🚀 Инициализирован error-логгер")
