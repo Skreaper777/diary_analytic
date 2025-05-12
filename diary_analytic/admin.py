@@ -2,14 +2,21 @@ from django.contrib import admin, messages
 from django import forms
 from django.shortcuts import redirect
 from django.urls import path
-import pandas as pd
-from .models import Parameter
 from django.template.response import TemplateResponse
 from django.utils.html import format_html
-from django.utils.translation import gettext_lazy as _  # для надписей, если надо переводить интерфейс
+from django.utils.translation import gettext_lazy as _
+from django.conf import settings
 
+import os
+import pandas as pd
+from slugify import slugify
+
+from .models import Entry, EntryValue, Parameter
+
+
+# 📥 Форма для загрузки Excel-файла
 class ExcelImportForm(forms.Form):
-    excel_file = forms.FileField(label="Excel-файл с параметрами")
+    excel_file = forms.FileField(label="Excel-файл с данными")
 
 
 @admin.register(Parameter)
@@ -37,35 +44,79 @@ class ParameterAdmin(admin.ModelAdmin):
         if request.method == "POST" and form.is_valid():
             try:
                 df = pd.read_excel(form.cleaned_data["excel_file"])
-                if not {"key", "name"}.issubset(df.columns):
-                    self.message_user(request, "❌ В Excel не хватает колонок 'key' и 'name'", messages.ERROR)
+                columns = [col.strip() for col in df.columns]
+                df.columns = columns
+
+                if len(columns) < 2:
+                    self.message_user(request, "❌ Файл должен содержать дату и хотя бы один параметр", messages.ERROR)
                     return redirect("..")
 
-                created, updated = 0, 0
-                for _, row in df.iterrows():
-                    key = str(row["key"]).strip()
-                    name = str(row["name"]).strip()
-                    param, is_created = Parameter.objects.update_or_create(
-                        key=key,
-                        defaults={"name": name, "is_active": True},
-                    )
-                    if is_created:
-                        created += 1
-                    else:
-                        updated += 1
+                param_cache = {p.name_ru.strip(): p for p in Parameter.objects.all()}
+                param_counter = len(param_cache)
+                entries = {}
+                entry_values_to_create = []
+                entry_values_to_update = []
+                existing_entry_values = {
+                    (ev.entry_id, ev.parameter_id): ev
+                    for ev in EntryValue.objects.select_related("entry", "parameter")
+                }
 
-                self.message_user(request, f"✅ Импорт завершён: создано {created}, обновлено {updated}")
+                for index, row in df.iterrows():
+                    date_str = str(row[columns[0]]).strip()
+                    try:
+                        entry_date = pd.to_datetime(date_str).date()
+                    except Exception as e:
+                        self.message_user(request, f"⚠️ Пропущена строка с некорректной датой '{date_str}': {e}", messages.WARNING)
+                        continue
+
+                    if entry_date not in entries:
+                        entries[entry_date], _ = Entry.objects.get_or_create(date=entry_date)
+
+                    entry = entries[entry_date]
+
+                    for col in columns[1:]:
+                        value = row[col]
+                        if pd.isnull(value):
+                            continue
+
+                        name_ru = col.strip()
+                        param = param_cache.get(name_ru)
+
+                        if not param:
+                            key = slugify(name_ru)
+                            if not key:
+                                param_counter += 1
+                                key = f"param_{param_counter}"
+                            param = Parameter.objects.create(name=name_ru, key=key)
+                            param_cache[name_ru] = param
+
+                        key_tuple = (entry.id, param.id)
+                        if key_tuple in existing_entry_values:
+                            ev = existing_entry_values[key_tuple]
+                            ev.value = float(value)
+                            entry_values_to_update.append(ev)
+                        else:
+                            ev = EntryValue(entry=entry, parameter=param, value=float(value))
+                            entry_values_to_create.append(ev)
+
+                if entry_values_to_create:
+                    EntryValue.objects.bulk_create(entry_values_to_create)
+                if entry_values_to_update:
+                    EntryValue.objects.bulk_update(entry_values_to_update, ["value"])
+
+                created = len(entry_values_to_create)
+                updated = len(entry_values_to_update)
+
+                self.message_user(request, f"✅ Импорт завершён. Создано: {created}, обновлено: {updated}", messages.SUCCESS)
                 return redirect("..")
 
             except Exception as e:
-                self.message_user(request, f"❌ Ошибка импорта: {e}", messages.ERROR)
+                self.message_user(request, f"❌ Ошибка при импорте: {e}", messages.ERROR)
                 return redirect("..")
 
         context = {
-            "title": "Импорт параметров из Excel",
+            "title": "Импорт Excel-файла с Entry и параметрами",
             "form": form,
             "opts": self.model._meta,
         }
         return TemplateResponse(request, "admin/import_excel.html", context)
-
-
