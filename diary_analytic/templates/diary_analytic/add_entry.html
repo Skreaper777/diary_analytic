@@ -1,4 +1,5 @@
 {% load static %}
+{% load diary_filters %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -164,9 +165,9 @@
       <div class="parameter-block" data-key="{{ param.key }}">
         <div class="param-title">{{ param.name }}</div>
         <div class="rating-buttons">
-          {% for i in "0"|make_list:" "|add:"1"|make_list:" "|add:"2"|make_list:" "|add:"3"|make_list:" "|add:"4"|make_list:" "|add:"5" %}
+          {% for i in "012345"|make_list %}
             {% with val=i|stringformat:"d" %}
-              {% if values_map[param.key] == val|float %}
+              {% if values_map|get:param.key == val|float %}
                 <button class="value-button selected" data-value="{{ val }}">{{ val }}</button>
               {% else %}
                 <button class="value-button" data-value="{{ val }}">{{ val }}</button>
