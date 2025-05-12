@@ -58,3 +58,24 @@ class ParameterAdmin(admin.ModelAdmin):
             "opts": self.model._meta,
         }
         return TemplateResponse(request, "admin/import_excel.html", context)
+
+
+@admin.register(Entry)
+class EntryAdmin(admin.ModelAdmin):
+    list_display = ("date", "get_values")
+    list_filter = ("date",)
+    search_fields = ("date",)
+    date_hierarchy = "date"
+
+    def get_values(self, obj):
+        values = obj.entryvalue_set.select_related("parameter")
+        return ", ".join(f"{v.parameter.name}: {v.value}" for v in values)
+    get_values.short_description = "Значения параметров"
+
+
+@admin.register(EntryValue)
+class EntryValueAdmin(admin.ModelAdmin):
+    list_display = ("entry", "parameter", "value")
+    list_filter = ("parameter", "entry__date")
+    search_fields = ("parameter__name", "entry__date")
+    date_hierarchy = "entry__date"
