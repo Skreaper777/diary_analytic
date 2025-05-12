@@ -44,6 +44,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       });
     });
+
+    // ✅ Вызываем загрузку прогнозов после инициализации кнопок
+  loadPredictions();
   });
   
   // 🔐 Получение CSRF-токена из cookie
@@ -60,5 +63,66 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
     return cookieValue;
+  }
+  // 📡 Функция загрузки прогнозов с сервера
+async function loadPredictions() {
+    // 🕓 1. Получаем дату, выбранную в поле <input type="date">
+    const date = document.getElementById("date-input")?.value;
+    if (!date) return; // если даты нет — прекращаем
+  
+    try {
+      // 🌐 2. Отправляем GET-запрос на /predict/?date=...
+      const res = await fetch(`/predict/?date=${encodeURIComponent(date)}`);
+  
+      // 🧾 3. Разбираем JSON-ответ с прогнозами
+      const data = await res.json();
+  
+      // Пример: data = { "ustalost_base": 3.4, "toshn_base": 1.2 }
+  
+      // 🔁 4. Перебираем каждый параметр и его предсказанное значение
+      Object.entries(data).forEach(([key, value]) => {
+        // Убираем суффикс "_base" → получаем чистый параметр (например: "ustalost")
+        const paramKey = key.replace("_base", "");
+  
+        // 🎯 Ищем блоки для вставки значений
+        const target = document.getElementById(`predicted-${paramKey}`);          // основной прогноз
+        const deltaTarget = document.getElementById(`predicted-delta-${paramKey}`); // дельта
+  
+        if (target) {
+          // 📌 5. Проверяем — есть ли уже сохранённое значение у пользователя
+          const selectedButton = document
+            .querySelector(`.parameter-block[data-key="${paramKey}"] .value-button.selected`);
+  
+          // Преобразуем значение в число (или NaN, если ничего не выбрано)
+          const current = parseFloat(selectedButton?.getAttribute("data-value") || "NaN");
+  
+          // 🔁 6. Считаем дельту, если возможно
+          const delta = isNaN(current) ? null : value - current;
+          const absDelta = delta !== null ? Math.abs(delta) : null;
+  
+          // 📥 7. Вставляем текст прогноза и дельты
+          target.textContent = `Прогноз: ${value.toFixed(1)}`;
+          deltaTarget.textContent = delta !== null ? `Δ ${delta.toFixed(1)}` : "";
+  
+          // 🎨 8. Вычисляем цвет подсказки
+          let color = "gray";
+          if (absDelta !== null) {
+            if (absDelta < 1) color = "green";
+            else if (absDelta <= 2) color = "yellow";
+            else color = "red";
+          }
+  
+          // 🟢 9. Вставляем цвет как data-атрибут (для CSS-стилизации)
+          target.dataset.color = color;
+        }
+      });
+  
+      // ✅ Лог в консоль: успех
+      console.log("✅ Прогнозы успешно загружены:", data);
+  
+    } catch (err) {
+      // ❌ Если ошибка — логируем в консоль
+      console.error("❌ Ошибка загрузки прогнозов", err);
+    }
   }
   
