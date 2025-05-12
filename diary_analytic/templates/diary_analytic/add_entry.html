@@ -1,0 +1,184 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Форма дневника состояния</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #1e1e1e;
+      color: #eee;
+      padding: 40px 20px;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      background: #111;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    form {
+      margin-bottom: 30px;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      font-size: 1.1em;
+      border: 1px solid #444;
+      border-radius: 8px;
+      resize: vertical;
+      background: #222;
+      color: #eee;
+    }
+
+    button[type="submit"] {
+      margin-top: 20px;
+      padding: 14px;
+      font-size: 1.1em;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #1e7e34;
+    }
+
+    .parameter-block {
+      margin-bottom: 28px;
+      padding: 12px;
+      border: 1px solid #444;
+      border-radius: 10px;
+      background-color: #1a1a1a;
+    }
+
+    .param-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .rating-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .value-button {
+      width: 2.5rem;
+      height: 2.5rem;
+      font-size: 0.9em;
+      border: 2px solid #444;
+      border-radius: 6px;
+      background: #222;
+      color: #eee;
+      cursor: pointer;
+      transition: 0.2s ease;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .value-button.selected {
+      background-color: #28a745;
+      color: white;
+      border-color: #28a745;
+    }
+
+    .prediction-wrapper {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .prediction-block {
+      background: #222;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 6px 10px;
+      flex: 1;
+    }
+
+    .prediction-title {
+      font-weight: bold;
+      font-size: 0.85em;
+      margin-bottom: 4px;
+      color: #bbb;
+    }
+
+    .predicted {
+      font-size: 0.85em;
+      color: #aaa;
+      margin-bottom: 2px;
+    }
+
+    .predicted[data-color="green"]  { color: #28a745; }
+    .predicted[data-color="yellow"] { color: #e0a800; }
+    .predicted[data-color="red"]    { color: #dc3545; }
+
+    .predicted-secondary {
+      font-size: 0.75em;
+      color: #888;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📘 Дневник состояния на {{ selected_date }}</h2>
+
+    <!-- 📝 Форма комментария -->
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">💾 Сохранить комментарий</button>
+    </form>
+
+    <!-- 📊 Параметры -->
+    {% for param in parameters %}
+      <div class="parameter-block" data-key="{{ param.key }}">
+        <div class="param-title">{{ param.name }}</div>
+
+        <div class="rating-buttons">
+          {% for i in "0"|make_list|stringformat:"s"|add:"1"|make_list|stringformat:"s"|add:"2"|make_list|stringformat:"s"|add:"3"|make_list|stringformat:"s"|add:"4"|make_list|stringformat:"s"|add:"5" %}
+            {% with val=i|stringformat:"d" %}
+              {% if values_map[param.key] == val|add:""|float %}
+                <button class="value-button selected" data-value="{{ val }}">{{ val }}</button>
+              {% else %}
+                <button class="value-button" data-value="{{ val }}">{{ val }}</button>
+              {% endif %}
+            {% endwith %}
+          {% endfor %}
+        </div>
+
+        <!-- Плейсхолдер под прогнозы -->
+        <div class="prediction-wrapper">
+          <div class="prediction-block" data-param="{{ param.key }}">
+            <div class="prediction-title">База</div>
+            <div class="predicted" id="predicted-{{ param.key }}">–</div>
+            <div class="predicted-secondary" id="predicted-delta-{{ param.key }}">Δ –</div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <script src="{% static 'diary_analytic/js/diary.js' %}"></script>
+</body>
+</html>
