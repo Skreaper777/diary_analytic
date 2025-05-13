@@ -108,6 +108,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // Инициализация графиков истории
   initAllParameterCharts(dateValue);
+  setupChartsToggleBtn();
+  // Восстанавливаем видимость графиков
+  setChartsVisible(loadChartsVisibleState());
 
   const btn = document.getElementById('retrain-models-btn');
   if (btn) {
@@ -148,6 +151,9 @@ document.addEventListener("DOMContentLoaded", async function () {
       }, 100);
     });
   }
+
+  setupPredictionsToggleBtn();
+  setPredictionsVisible(loadPredictionsVisibleState());
 });
 
 // 🔐 Получение CSRF-токена из cookie
@@ -275,22 +281,38 @@ async function loadParameterHistory(paramKey, dateStr) {
     ctx.style.display = '';
     if (emptyDiv) emptyDiv.style.display = 'none';
 
-    // Строим график
+    // Один dataset, цвет линии меняется динамически через segment.borderColor
+    const monthsRu = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+    const labels = data.dates.map(d => {
+      const [y, m, d2] = d.split('-');
+      return `${parseInt(d2,10)} ${monthsRu[parseInt(m,10)-1]}`;
+    });
     ctx._chartInstance = new window.Chart(ctx, {
       type: 'line',
       data: {
-        labels: data.dates,
+        labels,
         datasets: [{
           label: '',
           data: data.values,
-          borderColor: '#007bff',
-          backgroundColor: 'rgba(0,123,255,0.08)',
+          borderColor: '#28a745', // по умолчанию
+          backgroundColor: 'rgba(40,167,69,0.10)',
           pointRadius: 2.5,
-          pointBackgroundColor: '#007bff',
+          pointBackgroundColor: '#28a745',
           pointBorderColor: '#222',
           borderWidth: 2,
           tension: 0.25,
           fill: true,
+          spanGaps: true,
+          segment: {
+            borderColor: ctx => {
+              const v = ctx.p0.parsed.y;
+              return v >= 3 ? '#e0a800' : '#28a745';
+            },
+            backgroundColor: ctx => {
+              const v = ctx.p0.parsed.y;
+              return v >= 3 ? 'rgba(224,168,0,0.10)' : 'rgba(40,167,69,0.10)';
+            }
+          }
         }]
       },
       options: {
@@ -323,5 +345,63 @@ function initAllParameterCharts(dateStr) {
   document.querySelectorAll('.parameter-block').forEach(block => {
     const paramKey = block.getAttribute('data-key');
     loadParameterHistory(paramKey, dateStr);
+  });
+}
+
+// --- Управление отображением графиков ---
+function setChartsVisible(visible) {
+  document.querySelectorAll('.history-chart-block').forEach(block => {
+    block.style.display = visible ? '' : 'none';
+  });
+  const btn = document.getElementById('charts-toggle-btn');
+  if (btn) btn.classList.toggle('active', visible);
+}
+
+function saveChartsVisibleState(visible) {
+  localStorage.setItem('diary_charts_visible', visible ? '1' : '0');
+}
+
+function loadChartsVisibleState() {
+  const val = localStorage.getItem('diary_charts_visible');
+  if (val === null) return true; // по умолчанию графики включены
+  return val === '1';
+}
+
+function setupChartsToggleBtn() {
+  const btn = document.getElementById('charts-toggle-btn');
+  if (!btn) return;
+  btn.addEventListener('click', function() {
+    const nowVisible = !loadChartsVisibleState();
+    setChartsVisible(nowVisible);
+    saveChartsVisibleState(nowVisible);
+  });
+}
+
+// --- Управление отображением прогнозов ---
+function setPredictionsVisible(visible) {
+  document.querySelectorAll('.prediction-wrapper').forEach(block => {
+    block.style.display = visible ? '' : 'none';
+  });
+  const btn = document.getElementById('predictions-toggle-btn');
+  if (btn) btn.classList.toggle('active', visible);
+}
+
+function savePredictionsVisibleState(visible) {
+  localStorage.setItem('diary_predictions_visible', visible ? '1' : '0');
+}
+
+function loadPredictionsVisibleState() {
+  const val = localStorage.getItem('diary_predictions_visible');
+  if (val === null) return true; // по умолчанию прогнозы включены
+  return val === '1';
+}
+
+function setupPredictionsToggleBtn() {
+  const btn = document.getElementById('predictions-toggle-btn');
+  if (!btn) return;
+  btn.addEventListener('click', function() {
+    const nowVisible = !loadPredictionsVisibleState();
+    setPredictionsVisible(nowVisible);
+    savePredictionsVisibleState(nowVisible);
   });
 }

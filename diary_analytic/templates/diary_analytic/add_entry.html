@@ -193,7 +193,13 @@
       display: flex;
       gap: 12px;
       margin-bottom: 18px;
-      justify-content: flex-start;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sort-btns-left {
+      display: flex;
+      gap: 12px;
     }
 
     .sort-btn {
@@ -275,6 +281,27 @@
       height: 90px !important;
       display: block;
     }
+
+    .charts-toggle-btn {
+      background: #222;
+      color: #eee;
+      border: 1.5px solid #444;
+      border-radius: 7px;
+      padding: 7px 18px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border 0.2s;
+      margin-left: 16px;
+    }
+    .charts-toggle-btn.active {
+      background: #007bff;
+      color: #fff;
+      border-color: #007bff;
+    }
+
+    .charts-toggle-btn#predictions-toggle-btn {
+      margin-left: 8px;
+    }
   </style>
 </head>
 <body>
@@ -294,9 +321,13 @@
 
     <!-- Параметры -->
     <div class="sort-buttons-row">
-      <button type="button" class="sort-btn" data-sort="name">Имя <span class="sort-arrow"></span></button>
-      <button type="button" class="sort-btn" data-sort="value">Значение <span class="sort-arrow"></span></button>
-      <button type="button" class="sort-btn" data-sort="prediction">Прогноз <span class="sort-arrow"></span></button>
+      <div class="sort-btns-left">
+        <button type="button" class="sort-btn" data-sort="name">Имя <span class="sort-arrow"></span></button>
+        <button type="button" class="sort-btn" data-sort="value">Значение <span class="sort-arrow"></span></button>
+        <button type="button" class="sort-btn" data-sort="prediction">Прогноз <span class="sort-arrow"></span></button>
+      </div>
+      <button type="button" class="charts-toggle-btn" id="charts-toggle-btn">Графики</button>
+      <button type="button" class="charts-toggle-btn" id="predictions-toggle-btn">Прогноз</button>
     </div>
 
     {% for param in parameters %}
@@ -316,7 +347,7 @@
             </div>
           </div>
         </div>
-        <div class="history-chart-block">
+        <div class="history-chart-block" style="display:none;">
           <canvas id="history-chart-{{ param.key }}" height="90"></canvas>
           <div class="history-chart-empty" id="history-chart-empty-{{ param.key }}" style="display:none;color:#888;text-align:center;font-size:0.95em;margin-top:4px;">Нет данных для графика</div>
         </div>
