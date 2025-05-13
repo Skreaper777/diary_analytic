@@ -52,10 +52,10 @@ class PredictorManager:
         predict_logger.debug(f"🔁 [train] Стратегия: {strategy}, Target: {target}, Исключения: {exclude}")
 
         if strategy == "base":
-            return base_model.train_model(df, target, exclude)
+            return base_model.train_model(df, target, exclude=exclude)
 
         elif strategy == "flags":
-            return flags_model.train_model(df, target, exclude)
+            return flags_model.train_model(df, target, exclude=exclude)
 
         else:
             raise ValueError(f"❌ Неизвестная стратегия обучения: {strategy}")
@@ -78,10 +78,10 @@ class PredictorManager:
 
         try:
             if strategy == "base":
-                return base_model.predict(model, today_row)
+                return base_model.predict(model["model"], model["features"], today_row)
 
             elif strategy == "flags":
-                return flags_model.predict(model, today_row)
+                return flags_model.predict(model["model"], model["features"], today_row)
 
             else:
                 raise ValueError(f"❌ Неизвестная стратегия предсказания: {strategy}")

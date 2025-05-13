@@ -17,15 +17,17 @@ from .loggers import predict_logger
 
 class base_model:
     @staticmethod
-    def train_model(df, target: str, exclude: list):
+    def train_model(df, target: str, *, exclude=None):
         """
         Обучает простую линейную модель для прогнозирования target.
 
         :param df: DataFrame с данными
         :param target: название целевого параметра
-        :param exclude: список параметров для исключения
+        :param exclude: список параметров для исключения (по умолчанию пустой)
         :return: обученная модель
         """
+        if exclude is None:
+            exclude = []
         # Убираем исключённые параметры
         features = [col for col in df.columns if col not in exclude]
         
@@ -38,21 +40,21 @@ class base_model:
         model.fit(X, y)
         
         predict_logger.debug(f"✅ Обучена base_model для {target}")
-        return model
+        return {"model": model, "features": features}
 
     @staticmethod
-    def predict(model, today_row: dict) -> float:
+    def predict(model, features, today_row: dict) -> float:
         """
         Делает прогноз на основе обученной модели.
 
         :param model: обученная модель
+        :param features: список признаков, использованных при обучении
         :param today_row: словарь с текущими значениями параметров
         :return: прогноз (float)
         """
-        # Преобразуем словарь в массив признаков
-        X = np.array([list(today_row.values())]).reshape(1, -1)
-        
-        # Делаем прогноз
+        # Формируем DataFrame с правильными именами признаков
+        import pandas as pd
+        X = pd.DataFrame([{f: today_row.get(f, 0.0) for f in features}])
         prediction = model.predict(X)[0]
         
         # Ограничиваем прогноз диапазоном [0, 5]
@@ -65,12 +67,12 @@ class base_model:
 
 class flags_model:
     @staticmethod
-    def train_model(df, target: str, exclude: list):
+    def train_model(df, target: str, *, exclude=None):
         """Заглушка для будущей реализации"""
-        raise NotImplementedError("🚧 flags_model пока не реализована")
+        return {"model": None, "features": []}
 
     @staticmethod
-    def predict(model, today_row: dict) -> float:
+    def predict(model, features, today_row: dict) -> float:
         """Заглушка для будущей реализации"""
         raise NotImplementedError("🚧 flags_model пока не реализована")
 

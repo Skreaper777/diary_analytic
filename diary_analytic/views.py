@@ -15,6 +15,7 @@ import os
 import traceback
 from django.conf import settings
 from diary_analytic.ml_utils.base_model import train_model as base_train_model
+import pandas as pd
 
 
 # --------------------------------------------------------------------
@@ -335,7 +336,13 @@ def get_predictions(request: HttpRequest) -> JsonResponse:
             model_path = os.path.join(model_dir, fname)
 
             try:
-                model = joblib.load(model_path)
+                model_dict = joblib.load(model_path)
+                if isinstance(model_dict, dict) and "model" in model_dict:
+                    model = model_dict["model"]
+                    features = model_dict.get("features", None)
+                else:
+                    model = model_dict
+                    features = None
                 web_logger.debug(f"[get_predictions] 📦 Загружена модель: {model_path}")
                 # Логируем shape входа и имена признаков
                 if hasattr(model, 'n_features_in_'):
@@ -343,15 +350,19 @@ def get_predictions(request: HttpRequest) -> JsonResponse:
                 if hasattr(model, 'feature_names_in_'):
                     web_logger.debug(f"[get_predictions] Модель {full_key} ожидает признаки: {model.feature_names_in_}")
                 # Преобразуем row в список признаков в том же порядке, что и при обучении
-                if hasattr(model, 'feature_names_in_'):
-                    X = [row.get(f, 0.0) for f in model.feature_names_in_]
+                if features is not None:
+                    X = pd.DataFrame([{f: row.get(f, 0.0) for f in features}])
                     web_logger.debug(f"[get_predictions] Вход для модели {full_key}: {X}")
-                    value = float(model.predict([X])[0])
+                    value = float(model.predict(X)[0])
+                elif hasattr(model, 'feature_names_in_'):
+                    X = pd.DataFrame([{f: row.get(f, 0.0) for f in model.feature_names_in_}])
+                    web_logger.debug(f"[get_predictions] Вход для модели {full_key}: {X}")
+                    value = float(model.predict(X)[0])
                 else:
                     # Fallback: просто все значения row
-                    X = list(row.values())
+                    X = pd.DataFrame([row])
                     web_logger.debug(f"[get_predictions] Вход для модели {full_key} (fallback): {X}")
-                    value = float(model.predict([X])[0])
+                    value = float(model.predict(X)[0])
                 predictions[full_key] = round(value, 2)
                 web_logger.debug("[get_predictions] ✅ Прогноз: %s = %.2f", full_key, value)
             except Exception as e:
