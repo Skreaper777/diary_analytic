@@ -148,13 +148,14 @@ def update_value(request):
         # --------------------------
         # 🔓 1. Распаковываем JSON
         # --------------------------
+        db_logger.info(f"[update_value] RAW BODY: {request.body}")
         data = json.loads(request.body)
-
         param_key = data.get("parameter")    # ключ параметра, например: "ustalost"
         value = data.get("value")            # значение от 0 до 5
         date_str = data.get("date")          # дата в строке, например: "2025-05-12"
+        db_logger.info(f"[update_value] PARSED: param_key={param_key!r}, value={value!r}, date_str={date_str!r}")
 
-        if not param_key or value is None or not date_str:
+        if not param_key or not date_str:
             db_logger.warning("⚠️ Не хватает обязательных полей в теле запроса")
             return JsonResponse({"error": "missing fields"}, status=400)
 
@@ -184,22 +185,26 @@ def update_value(request):
         # --------------------------
         # 💾 5. Обновляем или создаём EntryValue
         # --------------------------
-        ev, created = EntryValue.objects.update_or_create(
-            entry=entry,
-            parameter=parameter,
-            defaults={"value": float(value)}
-        )
-
-        # --------------------------
-        # 📜 6. Логируем результат
-        # --------------------------
-        action = "Создан" if created else "Обновлён"
-        db_logger.info(f"✅ {action} EntryValue: {param_key} = {value} ({entry_date})")
-
-        # --------------------------
-        # 📤 7. Возвращаем успех
-        # --------------------------
-        return JsonResponse({"success": True})
+        if value is None:
+            db_logger.info(f"[update_value] 🟡 value=None: запрос на удаление значения. param_key={param_key}, date={date_str}")
+            # Удаление значения
+            try:
+                deleted_count, deleted_details = EntryValue.objects.filter(entry=entry, parameter=parameter).delete()
+                db_logger.info(f"[update_value] 🗑️ Удалён EntryValue: {param_key} ({entry_date}), удалено записей: {deleted_count}")
+                return JsonResponse({"success": True, "deleted": True, "deleted_count": deleted_count})
+            except Exception as del_exc:
+                db_logger.exception(f"[update_value] ❌ Ошибка при удалении EntryValue: {param_key} ({entry_date}): {del_exc}")
+                return JsonResponse({"error": "delete error"}, status=500)
+        else:
+            db_logger.info(f"[update_value] 🟢 value={value}: обновление/создание значения. param_key={param_key}, date={date_str}")
+            ev, created = EntryValue.objects.update_or_create(
+                entry=entry,
+                parameter=parameter,
+                defaults={"value": float(value)}
+            )
+            action = "Создан" if created else "Обновлён"
+            db_logger.info(f"[update_value] ✅ {action} EntryValue: {param_key} = {value} ({entry_date})")
+            return JsonResponse({"success": True})
 
     except Exception as e:
         # 🔥 В случае любой ошибки — лог + JSON-ответ 500

@@ -28,12 +28,51 @@ document.addEventListener("DOMContentLoaded", function () {
       buttons.forEach((btn) => {
         btn.addEventListener("click", async function () {
           const selectedValue = parseInt(this.getAttribute("data-value"));
-  
+          const isAlreadySelected = this.classList.contains("selected");
+          // paramKey всегда берём из блока, а не из кнопки!
+          const paramKey = block.getAttribute("data-key");
+
+          if (isAlreadySelected) {
+            // Повторный клик — удаляем значение
+            const payload = {
+              parameter: paramKey,
+              value: null,
+              date: dateValue,
+            };
+            console.log("🟡 Отправка запроса на удаление:", payload);
+            try {
+              const response = await fetch("/update_value/", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "X-CSRFToken": getCookie("csrftoken"),
+                },
+                body: JSON.stringify(payload),
+              });
+              if (response.ok) {
+                console.log(`🗑️ Удалено: ${paramKey}`);
+                this.classList.remove("selected");
+                loadPredictions();
+              } else {
+                console.error(`❌ Ошибка удаления ${paramKey}`);
+              }
+            } catch (error) {
+              console.error("Ошибка соединения:", error);
+            }
+            return;
+          }
+
           // 1. Подсветка активной кнопки
           buttons.forEach((b) => b.classList.remove("selected"));
           this.classList.add("selected");
-  
+
           // 2. Отправка на сервер
+          const payload = {
+            parameter: paramKey,
+            value: selectedValue,
+            date: dateValue,
+          };
+          console.log("🟢 Отправка запроса на обновление:", payload);
           try {
             const response = await fetch("/update_value/", {
               method: "POST",
@@ -41,13 +80,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Content-Type": "application/json",
                 "X-CSRFToken": getCookie("csrftoken"),
               },
-              body: JSON.stringify({
-                parameter: paramKey,
-                value: selectedValue,
-                date: dateValue,
-              }),
+              body: JSON.stringify(payload),
             });
-  
+
             if (response.ok) {
               console.log(`✅ Обновлено: ${paramKey} = ${selectedValue}`);
               loadPredictions();
