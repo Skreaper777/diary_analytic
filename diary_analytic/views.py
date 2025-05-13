@@ -10,6 +10,7 @@ from .forms import EntryForm
 from .utils import get_diary_dataframe, get_today_row
 from .predictor_manager import PredictorManager
 from .loggers import web_logger, db_logger, predict_logger
+import json
 
 
 # --------------------------------------------------------------------
