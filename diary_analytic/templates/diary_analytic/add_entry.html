@@ -260,6 +260,21 @@
     #date-input[type="date"]::-ms-input-placeholder {
       color: #888;
     }
+
+    .history-chart-block {
+      margin-top: 8px;
+      background: #181818;
+      border: 1px solid #333;
+      border-radius: 7px;
+      padding: 8px 8px 2px 8px;
+      min-height: 60px;
+      max-width: 100%;
+    }
+    .history-chart-block canvas {
+      width: 100% !important;
+      height: 90px !important;
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -301,6 +316,10 @@
             </div>
           </div>
         </div>
+        <div class="history-chart-block">
+          <canvas id="history-chart-{{ param.key }}" height="90"></canvas>
+          <div class="history-chart-empty" id="history-chart-empty-{{ param.key }}" style="display:none;color:#888;text-align:center;font-size:0.95em;margin-top:4px;">Нет данных для графика</div>
+        </div>
       </div>
     {% endfor %}
 
@@ -313,6 +332,7 @@
   </div>
 
   <script src="{% static 'js/diary.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script>
     (function() {
       const sortBtn = document.querySelector('.sort-btn[data-sort="name"]');

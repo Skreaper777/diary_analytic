@@ -106,6 +106,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Загружаем прогнозы (старый способ)
   loadPredictions();
 
+  // Инициализация графиков истории
+  initAllParameterCharts(dateValue);
 
   const btn = document.getElementById('retrain-models-btn');
   if (btn) {
@@ -134,6 +136,16 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
       btn.disabled = false;
       btn.textContent = '🔁 Обновить прогнозы';
+    });
+  }
+
+  // При смене даты (если переход по календарю)
+  if (dateInput) {
+    dateInput.addEventListener('change', function() {
+      setTimeout(() => {
+        // После перехода по ссылке страница перезагрузится, но если SPA — можно раскомментировать:
+        // initAllParameterCharts(this.value);
+      }, 100);
     });
   }
 });
@@ -236,4 +248,80 @@ async function loadPredictions() {
     // ❌ Если ошибка — логируем в консоль
     console.error("[loadPredictions] ❌ Ошибка загрузки прогнозов", err);
   }
+}
+
+// --- Графики истории значений параметров ---
+async function loadParameterHistory(paramKey, dateStr) {
+  const chartId = `history-chart-${paramKey}`;
+  const emptyId = `history-chart-empty-${paramKey}`;
+  const ctx = document.getElementById(chartId);
+  const emptyDiv = document.getElementById(emptyId);
+  if (!ctx) return;
+
+  // Удаляем старый график, если есть
+  if (ctx._chartInstance) {
+    ctx._chartInstance.destroy();
+    ctx._chartInstance = null;
+  }
+
+  try {
+    const res = await fetch(`/api/parameter_history/?param=${encodeURIComponent(paramKey)}&date=${encodeURIComponent(dateStr)}`);
+    const data = await res.json();
+    if (!data.dates || !data.values || data.dates.length === 0) {
+      ctx.style.display = 'none';
+      if (emptyDiv) emptyDiv.style.display = '';
+      return;
+    }
+    ctx.style.display = '';
+    if (emptyDiv) emptyDiv.style.display = 'none';
+
+    // Строим график
+    ctx._chartInstance = new window.Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: data.dates,
+        datasets: [{
+          label: '',
+          data: data.values,
+          borderColor: '#007bff',
+          backgroundColor: 'rgba(0,123,255,0.08)',
+          pointRadius: 2.5,
+          pointBackgroundColor: '#007bff',
+          pointBorderColor: '#222',
+          borderWidth: 2,
+          tension: 0.25,
+          fill: true,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: true }
+        },
+        scales: {
+          x: {
+            ticks: { color: '#aaa', font: { size: 11 } },
+            grid: { color: '#222' }
+          },
+          y: {
+            min: 0, max: 5,
+            ticks: { color: '#aaa', font: { size: 11 }, stepSize: 1 },
+            grid: { color: '#222' }
+          }
+        }
+      }
+    });
+  } catch (e) {
+    ctx.style.display = 'none';
+    if (emptyDiv) emptyDiv.style.display = '';
+  }
+}
+
+// --- Инициализация графиков для всех параметров ---
+function initAllParameterCharts(dateStr) {
+  document.querySelectorAll('.parameter-block').forEach(block => {
+    const paramKey = block.getAttribute('data-key');
+    loadParameterHistory(paramKey, dateStr);
+  });
 }

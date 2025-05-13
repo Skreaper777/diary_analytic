@@ -31,4 +31,7 @@ urlpatterns = [
     # Возвращает JSON: {"success": true}
     # -----------------------------------------------------------
     path("update_value/", views.update_value, name="update_value"),
+
+    # API: история значений параметра
+    path("api/parameter_history/", views.parameter_history, name="parameter_history"),
 ]

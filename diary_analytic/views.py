@@ -339,3 +339,44 @@ def retrain_models_all(request: HttpRequest) -> JsonResponse:
     if any("❌" in msg for msg in results):
         return JsonResponse({"status": "error", "details": results})
     return JsonResponse({"status": "ok", "details": results})
+
+# --------------------------------------------------------------------
+# 📊 API: история значений параметра по датам
+# --------------------------------------------------------------------
+@require_GET
+def parameter_history(request):
+    """
+    Возвращает историю значений параметра по датам до (и включая) выбранную дату.
+    GET-параметры:
+        param: ключ параметра (например, 'ustalost')
+        date:  конечная дата (например, '2025-05-13')
+    Ответ: { dates: [...], values: [...] }
+    """
+    param_key = request.GET.get('param')
+    date_str = request.GET.get('date')
+    if not param_key or not date_str:
+        return JsonResponse({'error': 'missing param or date'}, status=400)
+    try:
+        to_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        return JsonResponse({'error': 'invalid date'}, status=400)
+
+    df = get_diary_dataframe()
+    if df.empty or param_key not in df.columns:
+        return JsonResponse({'dates': [], 'values': []})
+
+    # Оставляем только даты <= выбранной
+    df = df.loc[df.index <= to_date]
+    # Если данных нет — вернуть пусто
+    if df.empty:
+        return JsonResponse({'dates': [], 'values': []})
+
+    # Убираем пропуски
+    series = df[param_key].dropna()
+    if series.empty:
+        return JsonResponse({'dates': [], 'values': []})
+
+    # Формируем списки для ответа
+    dates = [d.strftime('%Y-%m-%d') for d in series.index]
+    values = series.values.tolist()
+    return JsonResponse({'dates': dates, 'values': values})
