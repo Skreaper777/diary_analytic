@@ -403,11 +403,12 @@ def retrain_models_all(request: HttpRequest) -> JsonResponse:
             try:
                 result = strategy_fn(df.copy(), target=target, exclude=[])
                 model = result.get("model")
+                features = result.get("features")
 
                 if model:
                     file_path = os.path.join(model_dir, f"{target}.pkl")
-                    joblib.dump(model, file_path)
-                    msg = f"[{strategy_name}] ✅ Обучено: {target}"
+                    joblib.dump({"model": model, "features": features}, file_path)
+                    msg = f"[{strategy_name}] ✅ Обучено и сохранено: {target}"
                     web_logger.info("[retrain] " + msg)
                     results.append(msg)
                 else:
@@ -416,7 +417,10 @@ def retrain_models_all(request: HttpRequest) -> JsonResponse:
                     results.append(msg)
             except Exception as e:
                 msg = f"[{strategy_name}] ❌ Ошибка при обучении {target}: {e}"
-                web_logger.error("[retrain] " + msg)
+                web_logger.exception("[retrain] " + msg)
                 results.append(msg)
 
+    # Новый блок: если есть ошибки, возвращаем status: error
+    if any("❌" in msg for msg in results):
+        return JsonResponse({"status": "error", "details": results})
     return JsonResponse({"status": "ok", "details": results})

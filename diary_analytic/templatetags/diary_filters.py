@@ -1,5 +1,6 @@
 # Импортируем модуль template из Django для создания пользовательских фильтров
 from django import template
+from diary_analytic.loggers import web_logger
 
 # Создаем экземпляр Library для регистрации пользовательских фильтров
 register = template.Library()
@@ -23,7 +24,7 @@ def get(dictionary, key):
     так как метод .get() не вызовет исключение, если ключ отсутствует в словаре.
     """
     value = dictionary.get(key)
-    print(f"🔍 Фильтр get: key={key}, value={value}, type={type(value)}")
+    web_logger.debug(f"[template filter get] key={key}, value={value}, type={type(value)}")
     return value
 
 @register.filter

@@ -157,17 +157,17 @@ LOGGING = {
     },
     'loggers': {
         'web': {
-            'handlers': ['web_file', 'console', 'error_file'],
+            'handlers': ['web_file', 'error_file'],
             'level': 'DEBUG',
             'propagate': False,
         },
         'predict': {
-            'handlers': ['predict_file', 'console', 'error_file'],
+            'handlers': ['predict_file', 'error_file'],
             'level': 'DEBUG',
             'propagate': False,
         },
         'db': {
-            'handlers': ['db_file', 'console', 'error_file'],
+            'handlers': ['db_file', 'error_file'],
             'level': 'DEBUG',
             'propagate': False,
         },

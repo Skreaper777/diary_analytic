@@ -161,10 +161,14 @@ document.addEventListener("DOMContentLoaded", async function () {
             'Content-Type': 'application/json',
           },
         });
-        if (res.ok) {
+        const data = await res.json();
+        if (data.status === 'ok') {
           alert('Модели успешно переобучены!');
+        } else if (data.status === 'error') {
+          // Можно сделать красивое модальное окно, но пока alert
+          alert('Есть ошибки при обучении моделей:\n' + (data.details || []).join('\n'));
         } else {
-          alert('Ошибка при обучении моделей');
+          alert('Неизвестный ответ от сервера');
         }
       } catch (e) {
         alert('Ошибка соединения');
