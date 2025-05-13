@@ -156,6 +156,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   setPredictionsVisible(loadPredictionsVisibleState());
 
   setupParamFilterInput();
+
+  setupChartsMinDateInput();
 });
 
 // 🔐 Получение CSRF-токена из cookie
@@ -283,9 +285,17 @@ async function loadParameterHistory(paramKey, dateStr) {
     ctx.style.display = '';
     if (emptyDiv) emptyDiv.style.display = 'none';
 
-    // Один dataset, цвет линии меняется динамически через segment.borderColor
+    // Фильтрация по минимальной дате
+    const minDate = loadChartsMinDate();
+    let filteredDates = data.dates;
+    let filteredValues = data.values;
+    if (minDate && data.dates.includes(minDate)) {
+      const idx = data.dates.indexOf(minDate);
+      filteredDates = data.dates.slice(idx);
+      filteredValues = data.values.slice(idx);
+    }
     const monthsRu = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
-    const labels = data.dates.map(d => {
+    const labels = filteredDates.map(d => {
       const [y, m, d2] = d.split('-');
       return `${parseInt(d2,10)} ${monthsRu[parseInt(m,10)-1]}`;
     });
@@ -295,8 +305,8 @@ async function loadParameterHistory(paramKey, dateStr) {
         labels,
         datasets: [{
           label: '',
-          data: data.values,
-          borderColor: '#28a745', // по умолчанию
+          data: filteredValues,
+          borderColor: '#28a745',
           backgroundColor: 'rgba(40,167,69,0.10)',
           pointRadius: 2.5,
           pointBackgroundColor: '#28a745',
@@ -348,6 +358,7 @@ function initAllParameterCharts(dateStr) {
     const paramKey = block.getAttribute('data-key');
     loadParameterHistory(paramKey, dateStr);
   });
+  fillChartsMinDateInput(loadChartsMinDate());
 }
 
 // --- Управление отображением графиков ---
@@ -441,3 +452,133 @@ function setupParamFilterInput() {
     saveParamFilterState(this.value);
   });
 }
+
+// --- Сортировка: инверсия стрелочек ---
+function updateArrow() {
+  if (sortState === 1) {
+    sortArrow.textContent = '▲'; // теперь ▲ — по возрастанию
+    sortBtn.classList.add('active');
+  } else if (sortState === 2) {
+    sortArrow.textContent = '▼'; // ▼ — по убыванию
+    sortBtn.classList.add('active');
+  } else {
+    sortArrow.textContent = '';
+    sortBtn.classList.remove('active');
+  }
+}
+
+function updateArrowValue() {
+  if (sortStateValue === 1) {
+    sortArrowValue.textContent = '▲';
+    sortBtnValue.classList.add('active');
+  } else if (sortStateValue === 2) {
+    sortArrowValue.textContent = '▼';
+    sortBtnValue.classList.add('active');
+  } else {
+    sortArrowValue.textContent = '';
+    sortBtnValue.classList.remove('active');
+  }
+}
+
+function updateArrowPred() {
+  if (sortStatePred === 1) {
+    sortArrowPred.textContent = '▲';
+    sortBtnPred.classList.add('active');
+  } else if (sortStatePred === 2) {
+    sortArrowPred.textContent = '▼';
+    sortBtnPred.classList.add('active');
+  } else {
+    sortArrowPred.textContent = '';
+    sortBtnPred.classList.remove('active');
+  }
+}
+
+// --- Минимальная дата для графиков ---
+function saveChartsMinDate(val) {
+  localStorage.setItem('diary_charts_min_date', val);
+}
+
+function loadChartsMinDate() {
+  return localStorage.getItem('diary_charts_min_date') || '';
+}
+
+async function fillChartsMinDateInput(selectedDate) {
+  const input = document.getElementById('charts-min-date');
+  if (!input) return;
+  try {
+    const firstBlock = document.querySelector('.parameter-block');
+    if (!firstBlock) return;
+    const paramKey = firstBlock.getAttribute('data-key');
+    const dateInput = document.getElementById('date-input');
+    const toDate = dateInput ? dateInput.value : '';
+    const res = await fetch(`/api/parameter_history/?param=${encodeURIComponent(paramKey)}&date=${encodeURIComponent(toDate)}`);
+    const data = await res.json();
+    if (!data.dates || data.dates.length === 0) {
+      input.value = '';
+      input.min = '';
+      input.max = '';
+      input.disabled = true;
+      return;
+    }
+    input.disabled = false;
+    input.min = data.dates[0];
+    input.max = data.dates[data.dates.length - 1];
+    // Восстанавливаем выбранное значение
+    if (selectedDate && data.dates.includes(selectedDate)) {
+      input.value = selectedDate;
+    } else {
+      input.value = data.dates[0];
+      saveChartsMinDate(data.dates[0]);
+    }
+  } catch {}
+}
+
+function setupChartsMinDateInput() {
+  const input = document.getElementById('charts-min-date');
+  if (!input) return;
+  fillChartsMinDateInput(loadChartsMinDate());
+  input.addEventListener('change', function() {
+    saveChartsMinDate(this.value);
+    initAllParameterCharts(document.getElementById('date-input').value);
+  });
+}
+
+// --- Сумма значений параметра с выбранной даты ---
+async function updateParameterSums() {
+  const minDateInput = document.getElementById('charts-min-date');
+  const dateInput = document.getElementById('date-input');
+  const minDate = minDateInput ? minDateInput.value : '';
+  const toDate = dateInput ? dateInput.value : '';
+  document.querySelectorAll('.parameter-block').forEach(async (block) => {
+    const paramKey = block.getAttribute('data-key');
+    const sumBlock = block.querySelector('.param-sum-block');
+    if (!sumBlock) return;
+    try {
+      const res = await fetch(`/api/parameter_history/?param=${encodeURIComponent(paramKey)}&date=${encodeURIComponent(toDate)}`);
+      const data = await res.json();
+      if (!data.dates || !data.values || data.dates.length === 0) {
+        sumBlock.textContent = '';
+        return;
+      }
+      let filteredValues = data.values;
+      if (minDate && data.dates.includes(minDate)) {
+        const idx = data.dates.indexOf(minDate);
+        filteredValues = data.values.slice(idx);
+      }
+      // Суммируем значения (игнорируем null/NaN)
+      const sum = filteredValues.reduce((acc, v) => acc + (typeof v === 'number' && !isNaN(v) ? v : 0), 0);
+      sumBlock.textContent = sum ? Math.round(sum) : '0';
+    } catch {
+      sumBlock.textContent = '';
+    }
+  });
+}
+
+// --- Обновлять сумму при изменении дат ---
+document.addEventListener('DOMContentLoaded', function() {
+  const minDateInput = document.getElementById('charts-min-date');
+  const dateInput = document.getElementById('date-input');
+  if (minDateInput) minDateInput.addEventListener('change', updateParameterSums);
+  if (dateInput) dateInput.addEventListener('change', updateParameterSums);
+  updateParameterSums();
+});
