@@ -192,10 +192,10 @@ document.addEventListener("DOMContentLoaded", async function () {
   function updateArrowSum() {
     if (!sortArrowSum) return;
     if (sortStateSum === 1) {
-      sortArrowSum.textContent = '▼';
+      sortArrowSum.textContent = '▲';
       sortBtnSum.classList.add('active');
     } else if (sortStateSum === 2) {
-      sortArrowSum.textContent = '▲';
+      sortArrowSum.textContent = '▼';
       sortBtnSum.classList.add('active');
     } else {
       sortArrowSum.textContent = '';
