@@ -158,6 +158,132 @@ document.addEventListener("DOMContentLoaded", async function () {
   setupParamFilterInput();
 
   setupChartsMinDateInput();
+
+  // --- Сортировка по сумме ---
+  const sortBtnSum = document.querySelector('.sort-btn[data-sort="sum"]');
+  const sortArrowSum = sortBtnSum ? sortBtnSum.querySelector('.sort-arrow') : null;
+  let sortStateSum = 0;
+
+  function getSumValue(block) {
+    const sumBlock = block.querySelector('.param-sum-block');
+    if (!sumBlock) return -1;
+    const val = sumBlock.textContent.trim();
+    const num = parseFloat(val.replace(',', '.'));
+    return isNaN(num) ? -1 : num;
+  }
+
+  function sortBySum(direction) {
+    const blocks = Array.from(document.querySelectorAll('.parameter-block'));
+    blocks.sort((a, b) => {
+      const valA = getSumValue(a);
+      const valB = getSumValue(b);
+      if (valA < valB) return direction === 1 ? -1 : 1;
+      if (valA > valB) return direction === 1 ? 1 : -1;
+      return 0;
+    });
+    const firstBlock = blocks[0];
+    const parent = firstBlock.parentNode;
+    blocks.forEach(block => parent.appendChild(block));
+    // Переместить форму комментария вниз
+    const form = parent.querySelector('form[method="post"]');
+    if (form) parent.appendChild(form);
+  }
+
+  function updateArrowSum() {
+    if (!sortArrowSum) return;
+    if (sortStateSum === 1) {
+      sortArrowSum.textContent = '▼';
+      sortBtnSum.classList.add('active');
+    } else if (sortStateSum === 2) {
+      sortArrowSum.textContent = '▲';
+      sortBtnSum.classList.add('active');
+    } else {
+      sortArrowSum.textContent = '';
+      sortBtnSum.classList.remove('active');
+    }
+  }
+
+  if (sortBtnSum) {
+    sortBtnSum.addEventListener('click', function() {
+      resetAllSortStates('sum');
+      sortStateSum = (sortStateSum + 1) % 3;
+      // Сбросить состояние у других кнопок
+      sortState = 0;
+      sortStateValue = 0;
+      sortStatePred = 0;
+      updateArrow();
+      updateArrowValue();
+      updateArrowPred();
+      if (sortStateSum === 1) {
+        sortBySum(1);
+        saveSortState('sum', 1);
+      } else if (sortStateSum === 2) {
+        sortBySum(-1);
+        saveSortState('sum', -1);
+      } else {
+        window.location.reload();
+        clearSortState();
+      }
+      updateArrowSum();
+    });
+  }
+
+  // --- Сброс всех сортировок (добавляем sum) ---
+  function resetAllSortStates(except) {
+    if (except !== 'name') {
+      sortState = 0;
+      if (typeof updateArrow === 'function') updateArrow();
+      if (typeof sortBtn !== 'undefined') sortBtn.classList.remove('active');
+    }
+    if (except !== 'value') {
+      sortStateValue = 0;
+      if (typeof updateArrowValue === 'function') updateArrowValue();
+      if (typeof sortBtnValue !== 'undefined') sortBtnValue.classList.remove('active');
+    }
+    if (except !== 'prediction') {
+      sortStatePred = 0;
+      if (typeof updateArrowPred === 'function') updateArrowPred();
+      if (typeof sortBtnPred !== 'undefined') sortBtnPred.classList.remove('active');
+    }
+    if (except !== 'sum') {
+      sortStateSum = 0;
+      if (typeof updateArrowSum === 'function') updateArrowSum();
+      if (typeof sortBtnSum !== 'undefined') sortBtnSum.classList.remove('active');
+    }
+  }
+
+  // --- Восстановление сортировки при загрузке страницы (добавляем sum) ---
+  document.addEventListener('DOMContentLoaded', function() {
+    const state = loadSortState && loadSortState();
+    if (!state) return;
+    if (state.type === 'name') {
+      sortState = state.direction === 1 ? 1 : 2;
+      if (typeof sortByName === 'function') sortByName(state.direction);
+      if (typeof updateArrow === 'function') updateArrow();
+    } else if (state.type === 'value') {
+      sortStateValue = state.direction === 1 ? 1 : 2;
+      if (typeof sortByValue === 'function') sortByValue(state.direction);
+      if (typeof updateArrowValue === 'function') updateArrowValue();
+    } else if (state.type === 'prediction') {
+      sortStatePred = state.direction === 1 ? 1 : 2;
+      if (typeof sortByPrediction === 'function') sortByPrediction(state.direction);
+      if (typeof updateArrowPred === 'function') updateArrowPred();
+    } else if (state.type === 'sum') {
+      sortStateSum = state.direction === 1 ? 1 : 2;
+      if (typeof sortBySum === 'function') sortBySum(state.direction);
+      if (typeof updateArrowSum === 'function') updateArrowSum();
+    }
+  });
+
+  // --- Глобальные переменные для сортировки по имени ---
+  window.sortBtn = document.querySelector('.sort-btn[data-sort="name"]');
+  window.sortArrow = sortBtn ? sortBtn.querySelector('.sort-arrow') : null;
+  // --- Глобальные переменные для сортировки по значению ---
+  window.sortBtnValue = document.querySelector('.sort-btn[data-sort="value"]');
+  window.sortArrowValue = sortBtnValue ? sortBtnValue.querySelector('.sort-arrow') : null;
+  // --- Глобальные переменные для сортировки по прогнозу ---
+  window.sortBtnPred = document.querySelector('.sort-btn[data-sort="prediction"]');
+  window.sortArrowPred = sortBtnPred ? sortBtnPred.querySelector('.sort-arrow') : null;
 });
 
 // 🔐 Получение CSRF-токена из cookie
@@ -582,3 +708,16 @@ document.addEventListener('DOMContentLoaded', function() {
   if (dateInput) dateInput.addEventListener('change', updateParameterSums);
   updateParameterSums();
 });
+
+// --- Сохранение и восстановление сортировки ---
+function saveSortState(type, direction) {
+  localStorage.setItem('diary_sort', JSON.stringify({type, direction}));
+}
+function clearSortState() {
+  localStorage.removeItem('diary_sort');
+}
+function loadSortState() {
+  try {
+    return JSON.parse(localStorage.getItem('diary_sort'));
+  } catch { return null; }
+}

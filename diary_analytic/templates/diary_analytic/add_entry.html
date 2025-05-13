@@ -349,6 +349,7 @@
       <div class="sort-btns-left">
         <button type="button" class="sort-btn" data-sort="name">Имя <span class="sort-arrow"></span></button>
         <button type="button" class="sort-btn" data-sort="value">Значение <span class="sort-arrow"></span></button>
+        <button type="button" class="sort-btn" data-sort="sum">Сумма <span class="sort-arrow"></span></button>
         <button type="button" class="sort-btn" data-sort="prediction">Прогноз <span class="sort-arrow"></span></button>
       </div>
       <div style="display: flex; align-items: center; gap: 12px;">
@@ -374,7 +375,7 @@
               <button class="value-button{% if values_map|get:param.key|stringformat:'g' == i %} selected{% endif %}" data-value="{{ i }}">{{ i }}</button>
             {% endfor %}
           </div>
-          <div class="param-sum-block" id="param-sum-{{ param.key }}" style="min-width: 60px; height: 2.5rem; display: flex; align-items: center; justify-content: center; background: #222; color: #eee; border: 2px solid #444; border-radius: 6px; font-size: 1em; margin-left: 10px; padding: 0 14px; font-weight: bold;"></div>
+          <div class="param-sum-block" id="param-sum-{{ param.key }}" style="min-width: 40px; height: 2.5rem; display: flex; align-items: center; justify-content: center; background: #007bff; color: #eee; border: 2px solid #007bff; border-radius: 6px; font-size: 1em; margin-left: 10px; padding: 0 14px; font-weight: bold;"></div>
           <div class="prediction-wrapper" style="margin-top: 0;">
             <div class="prediction-block">
               <div class="prediction-title">Прогноз</div>
