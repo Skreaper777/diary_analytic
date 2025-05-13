@@ -106,47 +106,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Загружаем прогнозы (старый способ)
   loadPredictions();
 
-  // Новый способ: Автоматическая загрузка прогнозов при открытии страницы
-  console.log("[predict] 📦 Старт загрузки прогнозов после DOMContentLoaded");
-  // Получаем значение даты из поля ввода или берём сегодняшнюю
-  const date = document.getElementById("date-input")?.value || new Date().toISOString().slice(0, 10);
-  console.log("[predict] 📅 Выбранная дата:", date);
-
-  try {
-      // Отправляем запрос на сервер за прогнозами
-      const res = await fetch(`/get_predictions/?date=${date}`);
-      console.log("[predict] 📡 Запрос отправлен на /get_predictions/");
-      const preds = await res.json();
-      console.log("[predict] 📥 Получен ответ:", preds);
-
-      // Обходим все прогнозы, например: toshn_base, mood_flags
-      for (const [key, value] of Object.entries(preds)) {
-          const [param, strategy] = key.split("_");
-          console.log(`[predict] 🔍 Обрабатываем прогноз: ${param}, стратегия: ${strategy}, значение: ${value}`);
-
-          const selector = `[data-param='${param}']`;
-          const el = document.querySelector(selector);
-
-          if (el) {
-              // Ищем или создаём блок .prediction
-              let block = el.querySelector(".prediction");
-              if (!block) {
-                  block = document.createElement("div");
-                  block.className = "prediction";
-                  el.appendChild(block);
-                  console.log(`[predict] ➕ Создан блок .prediction для параметра ${param}`);
-              }
-
-              // Добавляем строку с прогнозом
-              block.innerHTML += `<div><small>🔮 ${strategy}: <b>${value ?? "—"}</b></small></div>`;
-              console.log(`[predict] ✅ Прогноз добавлен: ${strategy}: ${value}`);
-          } else {
-              console.warn(`[predict] ⚠️ Элемент с data-param='${param}' не найден`);
-          }
-      }
-  } catch (err) {
-      console.error("[predict] ❌ Ошибка при получении или обработке прогнозов:", err);
-  }
 
   const btn = document.getElementById('retrain-models-btn');
   if (btn) {
@@ -198,41 +157,63 @@ function getCookie(name) {
 async function loadPredictions() {
   // 🕓 1. Получаем дату, выбранную в поле <input type="date">
   const date = document.getElementById("date-input")?.value;
-  if (!date) return; // если даты нет — прекращаем
+  console.log("[loadPredictions] Выбранная дата:", date);
+  if (!date) {
+    console.warn("[loadPredictions] Нет даты, прогнозы не будут загружены");
+    return; // если даты нет — прекращаем
+  }
 
   try {
-    // 🌐 2. Отправляем GET-запрос на /predict/?date=...
-    const res = await fetch(`/predict/?date=${encodeURIComponent(date)}`);
+    // 🌐 2. Отправляем GET-запрос на /get_predictions/?date=...
+    console.log(`[loadPredictions] Отправляю запрос: /get_predictions/?date=${encodeURIComponent(date)}`);
+    const res = await fetch(`/get_predictions/?date=${encodeURIComponent(date)}`);
 
     // 🧾 3. Разбираем JSON-ответ с прогнозами
     const data = await res.json();
+    console.log("[loadPredictions] Ответ от сервера:", data);
 
     // Пример: data = { "ustalost_base": 3.4, "toshn_base": 1.2 }
 
     // 🔁 4. Перебираем каждый параметр и его предсказанное значение
     Object.entries(data).forEach(([key, value]) => {
+      console.log(`[loadPredictions] Обрабатываю ключ: ${key}, значение: ${value}`);
       // Убираем суффикс "_base" → получаем чистый параметр (например: "ustalost")
       const paramKey = key.replace("_base", "");
+      console.log(`[loadPredictions] paramKey: ${paramKey}`);
 
       // 🎯 Ищем блоки для вставки значений
       const target = document.getElementById(`predicted-${paramKey}`);          // основной прогноз
       const deltaTarget = document.getElementById(`predicted-delta-${paramKey}`); // дельта
 
+      if (!target) {
+        console.warn(`[loadPredictions] Не найден элемент predicted-${paramKey}`);
+      }
+      if (!deltaTarget) {
+        console.warn(`[loadPredictions] Не найден элемент predicted-delta-${paramKey}`);
+      }
+
       if (target) {
         // 📌 5. Проверяем — есть ли уже сохранённое значение у пользователя
         const selectedButton = document
           .querySelector(`.parameter-block[data-key="${paramKey}"] .value-button.selected`);
+        if (!selectedButton) {
+          console.log(`[loadPredictions] Для ${paramKey} не выбрано значение пользователем`);
+        }
 
         // Преобразуем значение в число (или NaN, если ничего не выбрано)
         const current = parseFloat(selectedButton?.getAttribute("data-value") || "NaN");
+        console.log(`[loadPredictions] Текущее значение пользователя для ${paramKey}:`, current);
 
         // 🔁 6. Считаем дельту, если возможно
         const delta = isNaN(current) ? null : value - current;
         const absDelta = delta !== null ? Math.abs(delta) : null;
+        console.log(`[loadPredictions] Прогноз: ${value}, Дельта: ${delta}, Абс. дельта: ${absDelta}`);
 
         // 📥 7. Вставляем текст прогноза и дельты
         target.textContent = `Прогноз: ${value.toFixed(1)}`;
-        deltaTarget.textContent = delta !== null ? `Δ ${delta.toFixed(1)}` : "";
+        if (deltaTarget) {
+          deltaTarget.textContent = delta !== null ? `Δ ${delta.toFixed(1)}` : "";
+        }
 
         // 🎨 8. Вычисляем цвет подсказки
         let color = "gray";
@@ -241,6 +222,7 @@ async function loadPredictions() {
           else if (absDelta <= 2) color = "yellow";
           else color = "red";
         }
+        console.log(`[loadPredictions] Цвет для ${paramKey}:`, color);
 
         // 🟢 9. Вставляем цвет как data-атрибут (для CSS-стилизации)
         target.dataset.color = color;
@@ -248,10 +230,10 @@ async function loadPredictions() {
     });
 
     // ✅ Лог в консоль: успех
-    console.log("✅ Прогнозы успешно загружены:", data);
+    console.log("[loadPredictions] Прогнозы успешно обработаны:", data);
 
   } catch (err) {
     // ❌ Если ошибка — логируем в консоль
-    console.error("❌ Ошибка загрузки прогнозов", err);
+    console.error("[loadPredictions] ❌ Ошибка загрузки прогнозов", err);
   }
 }

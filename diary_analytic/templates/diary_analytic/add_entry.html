@@ -168,7 +168,7 @@
 
     <!-- Параметры -->
     {% for param in parameters %}
-      <div class="parameter-block" data-key="{{ param.key }}">
+      <div class="parameter-block" data-key="{{ param.key }}" data-param="{{ param.key }}">
         <div class="param-title">{{ param.name }}</div>
         <div class="rating-buttons">
           {% for i in "012345"|make_list %}
