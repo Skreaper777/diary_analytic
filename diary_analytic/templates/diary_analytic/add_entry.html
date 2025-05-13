@@ -278,7 +278,7 @@
     }
     .history-chart-block canvas {
       width: 100% !important;
-      height: 90px !important;
+      height: 112px !important;
       display: block;
     }
 
@@ -301,6 +301,29 @@
 
     .charts-toggle-btn#predictions-toggle-btn {
       margin-left: 8px;
+    }
+
+    .filter-row {
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: flex-start;
+    }
+    #param-filter-input {
+      width: 100%;
+      max-width: 340px;
+      background: #222;
+      color: #eee;
+      border: 1.5px solid #444;
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-size: 1em;
+      outline: none;
+      transition: border 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    }
+    #param-filter-input:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 0 2px #007bff33;
     }
   </style>
 </head>
@@ -328,6 +351,10 @@
       </div>
       <button type="button" class="charts-toggle-btn" id="charts-toggle-btn">Графики</button>
       <button type="button" class="charts-toggle-btn" id="predictions-toggle-btn">Прогноз</button>
+    </div>
+
+    <div class="filter-row">
+      <input id="param-filter-input" type="text" placeholder="Фильтр параметров..." autocomplete="off" />
     </div>
 
     {% for param in parameters %}

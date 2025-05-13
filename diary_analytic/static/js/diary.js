@@ -154,6 +154,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   setupPredictionsToggleBtn();
   setPredictionsVisible(loadPredictionsVisibleState());
+
+  setupParamFilterInput();
 });
 
 // 🔐 Получение CSRF-токена из cookie
@@ -323,12 +325,12 @@ async function loadParameterHistory(paramKey, dateStr) {
         },
         scales: {
           x: {
-            ticks: { color: '#aaa', font: { size: 11 } },
+            ticks: { color: '#aaa', font: { size: 8 } },
             grid: { color: '#222' }
           },
           y: {
             min: 0, max: 5,
-            ticks: { color: '#aaa', font: { size: 11 }, stepSize: 1 },
+            ticks: { color: '#aaa', font: { size: 8 }, stepSize: 1 },
             grid: { color: '#222' }
           }
         }
@@ -403,5 +405,39 @@ function setupPredictionsToggleBtn() {
     const nowVisible = !loadPredictionsVisibleState();
     setPredictionsVisible(nowVisible);
     savePredictionsVisibleState(nowVisible);
+  });
+}
+
+// --- Фильтрация параметров по тексту ---
+function filterParameterBlocks(filter) {
+  const blocks = document.querySelectorAll('.parameter-block');
+  if (!filter || !filter.trim()) {
+    blocks.forEach(b => b.style.display = '');
+    return;
+  }
+  const terms = filter.toLowerCase().split(/\s+/).filter(Boolean);
+  blocks.forEach(block => {
+    const title = block.querySelector('.param-title').textContent.toLowerCase();
+    const match = terms.some(term => title.includes(term));
+    block.style.display = match ? '' : 'none';
+  });
+}
+
+function saveParamFilterState(val) {
+  localStorage.setItem('diary_param_filter', val);
+}
+
+function loadParamFilterState() {
+  return localStorage.getItem('diary_param_filter') || '';
+}
+
+function setupParamFilterInput() {
+  const input = document.getElementById('param-filter-input');
+  if (!input) return;
+  input.value = loadParamFilterState();
+  filterParameterBlocks(input.value);
+  input.addEventListener('input', function() {
+    filterParameterBlocks(this.value);
+    saveParamFilterState(this.value);
   });
 }
