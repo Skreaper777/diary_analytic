@@ -13,6 +13,7 @@ import pandas as pd
 from datetime import date
 from .models import EntryValue, Entry, Parameter
 import os
+from .loggers import db_logger
 
 
 # --------------------------------------------------------------------
@@ -101,30 +102,39 @@ def get_today_row(target_date: date) -> dict:
 def export_diary_to_csv(filepath=None):
     """
     Экспортирует все значения параметров в CSV-файл (широкий формат, как Короткая таблица3.csv).
-    :param filepath: путь к файлу (по умолчанию other/Короткая таблица3.csv)
+    :param filepath: путь к файлу (по умолчанию other/export.csv)
     """
     if filepath is None:
         filepath = os.path.join("other", "export.csv")
 
-    # Получаем все параметры (по name, как в примере)
-    parameters = list(Parameter.objects.order_by("name"))
-    param_keys = [p.key for p in parameters]
-    param_names = [p.name for p in parameters]
+    try:
+        # Получаем все параметры (по name, как в примере)
+        parameters = list(Parameter.objects.order_by("name"))
+        param_keys = [p.key for p in parameters]
+        param_names = [p.name for p in parameters]
 
-    # Получаем все Entry (даты)
-    entries = list(Entry.objects.order_by("-date"))
+        # Получаем все Entry (даты)
+        entries = list(Entry.objects.order_by("-date"))
 
-    # Формируем строки для DataFrame
-    data = []
-    for entry in entries:
-        row = {"Дата": entry.date.strftime("%d.%m.%y")}
-        values = {ev.parameter_id: ev.value for ev in entry.entryvalue_set.all()}
-        for p in parameters:
-            row[p.name] = values.get(p.id, 0)
-        data.append(row)
+        # Формируем строки для DataFrame
+        data = []
+        for entry in entries:
+            row = {"Дата": entry.date.strftime("%d.%m.%y")}
+            values = {ev.parameter_id: ev.value for ev in entry.entryvalue_set.all()}
+            for p in parameters:
+                val = values.get(p.id, None)
+                if val is None:
+                    row[p.name] = ""
+                else:
+                    row[p.name] = int(val)
+            data.append(row)
 
-    df = pd.DataFrame(data)
-    # Ставим "Дата" первым столбцом, остальные — как в param_names
-    columns = ["Дата"] + param_names
-    df = df[columns]
-    df.to_csv(filepath, index=False, encoding="utf-8-sig")
+        import pandas as pd
+        df = pd.DataFrame(data)
+        # Ставим "Дата" первым столбцом, остальные — как в param_names
+        columns = ["Дата"] + param_names
+        df = df[columns]
+        df.to_csv(filepath, index=False, encoding="utf-8-sig")
+        db_logger.info(f"✅ Экспорт данных в CSV завершён: {filepath}, строк: {len(df)}")
+    except Exception as e:
+        db_logger.exception(f"❌ Ошибка при экспорте данных в CSV: {e}")
