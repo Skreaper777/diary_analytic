@@ -48,20 +48,19 @@ def train_model(
     my_test_logger.debug("=== train_model вызван для target=%s ===", target)
     if exclude is None:
         exclude = []
-
     df = df.reset_index()
     drop_cols = DROP_ALWAYS + exclude + [target]
     X = df.drop(columns=drop_cols, errors="ignore")
 
     # Логируем shape и типы исходных данных
-    my_test_logger.debug(f"=== train_model: target={target} ===")
-    my_test_logger.debug(f"df.shape: {df.shape}")
-    my_test_logger.debug(f"df.dtypes: {df.dtypes}")
-    my_test_logger.debug(f"df.head():\n{df.head()}\n")
-    my_test_logger.debug(f"X.shape: {X.shape}")
-    my_test_logger.debug(f"X.dtypes: {X.dtypes}")
-    my_test_logger.debug(f"X.head():\n{X.head()}\n")
-    my_test_logger.debug(f"X unique types: {[set(type(x) for x in X[col]) for col in X.columns]}")
+    base_model_logger.debug(f"=== train_model: target={target} ===")
+    base_model_logger.debug(f"df.shape: {df.shape}")
+    base_model_logger.debug(f"df.dtypes: {df.dtypes}")
+    base_model_logger.debug(f"df.head():\n{df.head()}\n")
+    base_model_logger.debug(f"X.shape: {X.shape}")
+    base_model_logger.debug(f"X.dtypes: {X.dtypes}")
+    base_model_logger.debug(f"X.head():\n{X.head()}\n")
+    base_model_logger.debug(f"X unique types: {[set(type(x) for x in X[col]) for col in X.columns]}")
 
     # Удаляем все столбцы, где есть хотя бы одно значение типа date/datetime
     def has_date_value(series):
@@ -75,6 +74,11 @@ def train_model(
     # Оставляем только числовые признаки
     X = X.select_dtypes(include=["number"]).fillna(0.0)
     y = df[target]
+
+    # Удаляем строки, где y == NaN
+    mask = ~y.isna()
+    X = X[mask]
+    y = y[mask]
 
     my_test_logger.debug(f"y.name: {y.name}")
     my_test_logger.debug(f"y.dtype: {y.dtype}")

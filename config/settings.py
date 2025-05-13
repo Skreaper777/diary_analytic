@@ -154,6 +154,12 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
         },
+        'base_model_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': str(BASE_DIR / 'logs/base_model.log'),
+            'encoding': 'utf-8',
+        },
     },
     'loggers': {
         'web': {
@@ -180,6 +186,11 @@ LOGGING = {
             'handlers': ['console', 'error_file'],
             'level': 'WARNING',
             'propagate': True,
+        },
+        'base_model': {
+            'handlers': ['base_model_file', 'error_file'],
+            'level': 'DEBUG',
+            'propagate': False,
         },
     },
 }
