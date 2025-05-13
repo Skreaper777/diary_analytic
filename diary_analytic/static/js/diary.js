@@ -225,6 +225,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         clearSortState();
       }
       updateArrowSum();
+      updateParameterSums();
     });
   }
 
@@ -582,10 +583,10 @@ function setupParamFilterInput() {
 // --- Сортировка: инверсия стрелочек ---
 function updateArrow() {
   if (sortState === 1) {
-    sortArrow.textContent = '▲'; // теперь ▲ — по возрастанию
+    sortArrow.textContent = '▼'; // ▼ — по возрастанию
     sortBtn.classList.add('active');
   } else if (sortState === 2) {
-    sortArrow.textContent = '▼'; // ▼ — по убыванию
+    sortArrow.textContent = '▲'; // ▲ — по убыванию
     sortBtn.classList.add('active');
   } else {
     sortArrow.textContent = '';
@@ -595,10 +596,10 @@ function updateArrow() {
 
 function updateArrowValue() {
   if (sortStateValue === 1) {
-    sortArrowValue.textContent = '▲';
+    sortArrowValue.textContent = '▼';
     sortBtnValue.classList.add('active');
   } else if (sortStateValue === 2) {
-    sortArrowValue.textContent = '▼';
+    sortArrowValue.textContent = '▲';
     sortBtnValue.classList.add('active');
   } else {
     sortArrowValue.textContent = '';
@@ -608,10 +609,10 @@ function updateArrowValue() {
 
 function updateArrowPred() {
   if (sortStatePred === 1) {
-    sortArrowPred.textContent = '▲';
+    sortArrowPred.textContent = '▼';
     sortBtnPred.classList.add('active');
   } else if (sortStatePred === 2) {
-    sortArrowPred.textContent = '▼';
+    sortArrowPred.textContent = '▲';
     sortBtnPred.classList.add('active');
   } else {
     sortArrowPred.textContent = '';
@@ -628,6 +629,19 @@ function loadChartsMinDate() {
   return localStorage.getItem('diary_charts_min_date') || '';
 }
 
+function setupChartsMinDateInput() {
+  const input = document.getElementById('charts-min-date');
+  if (!input) return;
+  // Восстанавливаем выбранную дату из localStorage
+  fillChartsMinDateInput(loadChartsMinDate());
+  input.addEventListener('change', function() {
+    saveChartsMinDate(this.value);
+    initAllParameterCharts(document.getElementById('date-input').value);
+    updateParameterSums(); // всегда обновлять сумму при смене даты
+  });
+}
+
+// --- fillChartsMinDateInput: всегда восстанавливаем выбранную дату из localStorage ---
 async function fillChartsMinDateInput(selectedDate) {
   const input = document.getElementById('charts-min-date');
   if (!input) return;
@@ -649,24 +663,18 @@ async function fillChartsMinDateInput(selectedDate) {
     input.disabled = false;
     input.min = data.dates[0];
     input.max = data.dates[data.dates.length - 1];
-    // Восстанавливаем выбранное значение
-    if (selectedDate && data.dates.includes(selectedDate)) {
+    // Восстанавливаем выбранное значение из localStorage или из selectedDate
+    const savedMinDate = loadChartsMinDate();
+    if (savedMinDate && data.dates.includes(savedMinDate)) {
+      input.value = savedMinDate;
+    } else if (selectedDate && data.dates.includes(selectedDate)) {
       input.value = selectedDate;
+      saveChartsMinDate(selectedDate);
     } else {
       input.value = data.dates[0];
       saveChartsMinDate(data.dates[0]);
     }
   } catch {}
-}
-
-function setupChartsMinDateInput() {
-  const input = document.getElementById('charts-min-date');
-  if (!input) return;
-  fillChartsMinDateInput(loadChartsMinDate());
-  input.addEventListener('change', function() {
-    saveChartsMinDate(this.value);
-    initAllParameterCharts(document.getElementById('date-input').value);
-  });
 }
 
 // --- Сумма значений параметра с выбранной даты ---
@@ -700,7 +708,7 @@ async function updateParameterSums() {
   });
 }
 
-// --- Обновлять сумму при изменении дат ---
+// --- Обновлять сумму при изменении дат и при загрузке страницы ---
 document.addEventListener('DOMContentLoaded', function() {
   const minDateInput = document.getElementById('charts-min-date');
   const dateInput = document.getElementById('date-input');
