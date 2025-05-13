@@ -174,17 +174,11 @@
           {% endfor %}
         </div>
 
-        <!-- Прогнозы будут позже -->
         <div class="prediction-wrapper">
           <div class="prediction-block">
-            <div class="prediction-title">Прогноз 1</div>
-            <div class="predicted">–</div>
-            <div class="predicted-secondary">Δ –</div>
-          </div>
-          <div class="prediction-block">
-            <div class="prediction-title">Прогноз 2</div>
-            <div class="predicted">–</div>
-            <div class="predicted-secondary">Δ –</div>
+            <div class="prediction-title">Прогноз</div>
+            <div class="predicted" id="predicted-{{ param.key }}">–</div>
+            <div class="predicted-secondary" id="predicted-delta-{{ param.key }}">Δ –</div>
           </div>
         </div>
       </div>

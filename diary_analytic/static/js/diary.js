@@ -50,6 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
             if (response.ok) {
               console.log(`✅ Обновлено: ${paramKey} = ${selectedValue}`);
+              loadPredictions();
             } else {
               console.error(`❌ Ошибка обновления ${paramKey}`);
             }
