@@ -369,7 +369,6 @@ def retrain_models_all(request: HttpRequest) -> JsonResponse:
     from .utils import get_diary_dataframe
     import joblib
 
-    print("=== retrain_models_all вызвана ===")
     web_logger.info("=== retrain_models_all вызвана ===")
     web_logger.info("[retrain] 🔁 Запущено переобучение моделей по всем стратегиям...")
 
@@ -385,7 +384,6 @@ def retrain_models_all(request: HttpRequest) -> JsonResponse:
         # если и после этого нет — не фильтруем
 
     web_logger.info(f"Перед обучением: df.columns = {list(df.columns)}")
-    print(f"Перед обучением: df.columns = {list(df.columns)}")
 
     strategies = [
         ("base", base_train_model),
@@ -405,7 +403,6 @@ def retrain_models_all(request: HttpRequest) -> JsonResponse:
                 continue
 
             web_logger.info(f"Перед train_model: target={target}, df.columns={list(df.columns)}")
-            print(f"Перед train_model: target={target}, df.columns={list(df.columns)}")
 
             try:
                 result = strategy_fn(df.copy(), target=target, exclude=[])

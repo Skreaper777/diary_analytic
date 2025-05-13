@@ -15,6 +15,7 @@ base_model_log_path = os.path.join(logs_dir, 'base_model.log')
 # Логгер для base_model.log
 base_model_logger = logging.getLogger("base_model")
 base_model_logger.handlers.clear()
+base_model_logger.propagate = False  # Отключаем передачу логов root-логгеру
 try:
     base_model_handler = logging.FileHandler(base_model_log_path, mode="a", encoding="utf-8")
     base_model_handler.setFormatter(logging.Formatter("[%(asctime)s] %(message)s"))
