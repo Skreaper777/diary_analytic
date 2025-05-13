@@ -14,7 +14,7 @@
     - для обучения модели: manager.train(strategy=..., ...)
 """
 
-from .ml_utils import base_model, flags_model
+from .ml_utils import base_model
 from .loggers import predict_logger
 
 

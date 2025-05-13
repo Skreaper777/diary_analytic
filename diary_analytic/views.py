@@ -14,7 +14,7 @@ import json
 import os
 import traceback
 from django.conf import settings
-from diary_analytic.ml_utils import base_model, flags_model
+from diary_analytic.ml_utils.base_model import train_model as base_train_model
 
 
 # --------------------------------------------------------------------
@@ -313,7 +313,7 @@ def get_predictions(request: HttpRequest) -> JsonResponse:
         return JsonResponse({"error": "no data"}, status=404)
 
     base_dir = os.path.join(settings.BASE_DIR, "diary_analytic", "trained_models")
-    strategies = ["base", "flags"]  # Здесь можно добавить другие стратегии при необходимости
+    strategies = ["base"]  # Здесь можно добавить другие стратегии при необходимости
     predictions = {}
 
     web_logger.debug("[get_predictions] 🔍 Стратегии для прогноза: %s", strategies)
@@ -369,7 +369,9 @@ def retrain_models_all(request: HttpRequest) -> JsonResponse:
     from .utils import get_diary_dataframe
     import joblib
 
-    web_logger.debug("[retrain] 🔁 Запущено переобучение моделей по всем стратегиям...")
+    print("=== retrain_models_all вызвана ===")
+    web_logger.info("=== retrain_models_all вызвана ===")
+    web_logger.info("[retrain] 🔁 Запущено переобучение моделей по всем стратегиям...")
 
     df = get_diary_dataframe()
     today = datetime.now().date()
@@ -382,9 +384,11 @@ def retrain_models_all(request: HttpRequest) -> JsonResponse:
             df = df[df["date"] < today]
         # если и после этого нет — не фильтруем
 
+    web_logger.info(f"Перед обучением: df.columns = {list(df.columns)}")
+    print(f"Перед обучением: df.columns = {list(df.columns)}")
+
     strategies = [
-        ("base", base_model.train_model),
-        ("flags", flags_model.train_model),
+        ("base", base_train_model),
     ]
 
     results = []
@@ -399,6 +403,9 @@ def retrain_models_all(request: HttpRequest) -> JsonResponse:
         for target in df.columns:
             if target in ("date", "Дата", "comment"):
                 continue
+
+            web_logger.info(f"Перед train_model: target={target}, df.columns={list(df.columns)}")
+            print(f"Перед train_model: target={target}, df.columns={list(df.columns)}")
 
             try:
                 result = strategy_fn(df.copy(), target=target, exclude=[])

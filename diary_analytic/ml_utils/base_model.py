@@ -10,8 +10,21 @@ logger = logging.getLogger(__name__)
 logs_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs')
 os.makedirs(logs_dir, exist_ok=True)
 my_test_log_path = os.path.join(logs_dir, 'my_test.log')
-print("my_test_log_path:", my_test_log_path)
+base_model_log_path = os.path.join(logs_dir, 'base_model.log')
 
+# Логгер для base_model.log
+base_model_logger = logging.getLogger("base_model")
+base_model_logger.handlers.clear()
+try:
+    base_model_handler = logging.FileHandler(base_model_log_path, mode="a", encoding="utf-8")
+    base_model_handler.setFormatter(logging.Formatter("[%(asctime)s] %(message)s"))
+    base_model_logger.addHandler(base_model_handler)
+    base_model_logger.setLevel(logging.DEBUG)
+except Exception as e:
+    # Если не удалось создать логгер, ничего не делаем
+    pass
+
+# Логгер для отладки входных данных
 my_test_logger = logging.getLogger("my_test")
 my_test_logger.handlers.clear()
 try:
@@ -20,7 +33,7 @@ try:
     my_test_logger.addHandler(my_test_handler)
     my_test_logger.setLevel(logging.DEBUG)
 except Exception as e:
-    print("Ошибка при создании my_test_handler:", e)
+    base_model_logger.error("Ошибка при создании my_test_handler: %s", e)
 
 DROP_ALWAYS = ["date", "Дата", "дата", "index"]
 
@@ -30,7 +43,7 @@ def train_model(
     *,
     exclude: list[str] | None = None,
 ):
-    print(f"=== train_model вызван для target={target} ===")
+    base_model_logger.info("=== train_model вызван для target=%s ===", target)
     my_test_logger.debug("=== train_model вызван для target=%s ===", target)
     if exclude is None:
         exclude = []
