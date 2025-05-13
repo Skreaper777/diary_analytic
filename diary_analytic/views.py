@@ -13,6 +13,8 @@ from .loggers import web_logger, db_logger, predict_logger
 import json
 import os
 import traceback
+from django.conf import settings
+from diary_analytic.ml_utils import base_model, flags_model
 
 
 # --------------------------------------------------------------------
@@ -371,11 +373,18 @@ def retrain_models_all(request: HttpRequest) -> JsonResponse:
 
     df = get_diary_dataframe()
     today = datetime.now().date()
-    df = df[df["date"] < today]
+    # Исправленная фильтрация по дате
+    if "date" in df.columns:
+        df = df[df["date"] < today]
+    else:
+        df = df.reset_index()
+        if "date" in df.columns:
+            df = df[df["date"] < today]
+        # если и после этого нет — не фильтруем
 
     strategies = [
-        ("base", __import__("diary_analytic.ml_utils.base_model", fromlist=["train_model"]).train_model),
-        ("flags", __import__("diary_analytic.ml_utils.flags_model", fromlist=["train_model"]).train_model),
+        ("base", base_model.train_model),
+        ("flags", flags_model.train_model),
     ]
 
     results = []

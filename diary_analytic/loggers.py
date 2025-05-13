@@ -66,17 +66,11 @@ def setup_logger(name: str, logfile: str) -> logging.Logger:
 # 🔧 Готовые логгеры под конкретные подсистемы
 # -------------------------------------------------------------------
 
-# 📘 WEB: маршруты, переходы, загрузка страниц, GET/POST параметры
-web_logger = setup_logger("web", "web.log")
-web_logger.info("🚀 Инициализирован web-логгер")
-
-# 📊 ML: вызов моделей, стратегия прогнозов, объяснения, ошибки моделей
-predict_logger = setup_logger("predict", "predict.log")
-predict_logger.info("🚀 Инициализирован predict-логгер")
-
-# 🗃️ БД: сохранение и удаление Entry, EntryValue, Parameter
-db_logger = setup_logger("db", "db.log")
-db_logger.info("🚀 Инициализирован db-логгер")
+# Стандартные логгеры, управляются через LOGGING в settings.py
+web_logger = logging.getLogger('web')
+predict_logger = logging.getLogger('predict')
+db_logger = logging.getLogger('db')
+error_logger = logging.getLogger('error')
 
 # Создаем логгер для ошибок
 error_logger = logging.getLogger("error")
@@ -103,3 +97,18 @@ web_logger.info("🚀 Инициализирован web-логгер")
 predict_logger.info("🚀 Инициализирован predict-логгер")
 db_logger.info("🚀 Инициализирован db-логгер")
 error_logger.info("🚀 Инициализирован error-логгер")
+
+# Очищаем все логи при запуске
+LOG_FILES = [
+    'web.log',
+    'predict.log',
+    'db.log',
+    'error.log',
+]
+
+for fname in LOG_FILES:
+    path = os.path.join(LOG_DIR, fname)
+    try:
+        open(path, 'w').close()
+    except Exception:
+        pass
