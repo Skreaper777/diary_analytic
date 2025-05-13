@@ -19,6 +19,7 @@ from .loggers import predict_logger
 import os
 import pandas as pd
 from pprint import pformat
+import joblib
 
 
 # -------------------------------------------------------------
@@ -30,14 +31,21 @@ class PredictorManager:
     Класс, управляющий вызовом нужной модели в зависимости от стратегии.
     """
 
-    def __init__(self):
-        """
-        Инициализация — ничего не требует.
-        Стратегия передаётся в момент вызова train() или predict_today().
-        """
-        pass
+    def __init__(self, strategy: str):
+        self.strategy = strategy
+        self.model_module = get_model(strategy)
 
-    def save_model_coefs(self, model, features, strategy, target):
+    def save_model(self, model, features, target):
+        """
+        Сохраняет модель и признаки в .pkl-файл.
+        """
+        model_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "diary_analytic", "trained_models", self.strategy)
+        os.makedirs(model_dir, exist_ok=True)
+        file_path = os.path.join(model_dir, f"{target}.pkl")
+        joblib.dump({"model": model, "features": features}, file_path)
+        predict_logger.info(f"[save_model] ✅ Модель сохранена: {file_path}")
+
+    def save_model_coefs(self, model, features, target):
         """
         Сохраняет коэффициенты и признаки модели в CSV-файл для последующего анализа.
         """
@@ -51,10 +59,10 @@ class PredictorManager:
                 coef_df["intercept"] = model.intercept_
                 export_dir = os.path.join(
                     os.path.dirname(os.path.dirname(__file__)),
-                    "diary_analytic", "trained_models", strategy, "csv"
+                    "diary_analytic", "trained_models", self.strategy, "csv"
                 )
                 os.makedirs(export_dir, exist_ok=True)
-                export_path = os.path.join(export_dir, f"{target}_{strategy}_coefs.csv")
+                export_path = os.path.join(export_dir, f"{target}_{self.strategy}_coefs.csv")
                 predict_logger.info(f"[save_model_coefs] Сохраняю CSV по пути: {export_path}")
                 coef_df.to_csv(export_path, index=False)
                 predict_logger.info(f"[save_model_coefs] CSV успешно сохранён: {export_path}")
@@ -63,38 +71,36 @@ class PredictorManager:
         else:
             predict_logger.warning(f"[save_model_coefs] Модель не имеет coef_ или model=None. model: {type(model)}, features: {features}")
 
-    # -----------------------------------------------------------------
-    # 🧪 Обучение модели по выбранной стратегии
-    # -----------------------------------------------------------------
-
-    def train(self, strategy: str, df, target: str, exclude: list):
+    def train(self, df):
         """
-        Обучает модель прогнозирования по всей истории.
-
-        :param strategy: название стратегии (например, 'base', 'flags')
-        :param df: датафрейм всех записей пользователя (pivot-таблица)
-        :param target: параметр, который нужно предсказывать
-        :param exclude: список признаков, которые нужно исключить (например, текущий target)
-
-        :return: обученная модель (или объект, пригодный для дальнейшего вызова predict)
+        Обучает все параметры (кроме служебных) по выбранной стратегии.
+        :param df: датафрейм всех записей пользователя
+        :return: список результатов по каждому target
         """
-        print("1111111111111")
-        predict_logger.info(f"[train] Запущен train для стратегии {strategy}, target={target}, exclude={exclude}")
-
-        if strategy == "base":
-            model = get_model("base").train_model(df, target, exclude=exclude)
-            predict_logger.info(f"[train] Модель обучена. Ключи model: {list(model.keys()) if isinstance(model, dict) else type(model)}")
-        else:
-            predict_logger.error(f"[train] Неизвестная стратегия обучения: {strategy}")
-            raise ValueError(f"❌ Неизвестная стратегия обучения: {strategy}")
-
-        try:
-            predict_logger.info("[train] Пробую сохранить коэффициенты модели в CSV")
-            self.save_model_coefs(model["model"], model["features"], strategy, target)
-        except Exception as e:
-            predict_logger.error(f"[train] Ошибка при сохранении CSV: {e}")
-
-        return model
+        results = []
+        for target in df.columns:
+            if target in ("date", "Дата", "comment"):
+                continue
+            predict_logger.info(f"[train] ▶️ Стратегия: {self.strategy}, target={target}, df.columns={list(df.columns)}")
+            try:
+                result = self.model_module.train_model(df.copy(), target=target, exclude=[])
+                model = result.get("model")
+                features = result.get("features")
+                if model:
+                    self.save_model(model, features, target)
+                    self.save_model_coefs(model, features, target)
+                    msg = f"[{self.strategy}] ✅ Обучено и сохранено: {target}"
+                    predict_logger.info("[train] " + msg)
+                    results.append(msg)
+                else:
+                    msg = f"[{self.strategy}] ⚠️ Пропущено: {target}"
+                    predict_logger.warning("[train] " + msg)
+                    results.append(msg)
+            except Exception as e:
+                msg = f"[{self.strategy}] ❌ Ошибка при обучении {target}: {e}"
+                predict_logger.exception("[train] " + msg)
+                results.append(msg)
+        return results
 
     # -----------------------------------------------------------------
     # 🔮 Прогнозирование текущего дня по выбранной стратегии

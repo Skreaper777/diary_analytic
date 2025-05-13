@@ -309,8 +309,6 @@ def get_predictions(request: HttpRequest) -> JsonResponse:
 @require_POST
 def retrain_models_all(request: HttpRequest) -> JsonResponse:
     from .utils import get_diary_dataframe
-    import joblib
-
     web_logger.info("=== retrain_models_all вызвана ===")
     web_logger.info("[retrain] 🔁 Запущено переобучение моделей по всем стратегиям...")
 
@@ -327,44 +325,15 @@ def retrain_models_all(request: HttpRequest) -> JsonResponse:
 
     web_logger.info(f"Перед обучением: df.columns = {list(df.columns)}")
 
-    strategies = [
-        ("base", get_model("base").train_model),
-    ]
-
+    strategies = ["base"]  # сюда легко добавлять новые стратегии
     results = []
 
-    for strategy_name, strategy_fn in strategies:
-        web_logger.debug("[retrain] ▶️ Стратегия: %s", strategy_name)
-
-        model_dir = os.path.join(settings.BASE_DIR, "diary_analytic", "trained_models", strategy_name)
-        os.makedirs(model_dir, exist_ok=True)
-        web_logger.debug("[retrain] 📁 Каталог моделей: %s", model_dir)
-
-        for target in df.columns:
-            if target in ("date", "Дата", "comment"):
-                continue
-
-            web_logger.info(f"Перед train_model: target={target}, df.columns={list(df.columns)}")
-
-            try:
-                result = strategy_fn(df.copy(), target=target, exclude=[])
-                model = result.get("model")
-                features = result.get("features")
-
-                if model:
-                    file_path = os.path.join(model_dir, f"{target}.pkl")
-                    joblib.dump({"model": model, "features": features}, file_path)
-                    msg = f"[{strategy_name}] ✅ Обучено и сохранено: {target}"
-                    web_logger.info("[retrain] " + msg)
-                    results.append(msg)
-                else:
-                    msg = f"[{strategy_name}] ⚠️ Пропущено: {target}"
-                    web_logger.warning("[retrain] " + msg)
-                    results.append(msg)
-            except Exception as e:
-                msg = f"[{strategy_name}] ❌ Ошибка при обучении {target}: {e}"
-                web_logger.exception("[retrain] " + msg)
-                results.append(msg)
+    from .predictor_manager import PredictorManager
+    for strategy_name in strategies:
+        web_logger.debug(f"[retrain] ▶️ Стратегия: {strategy_name}")
+        manager = PredictorManager(strategy_name)
+        res = manager.train(df.copy())
+        results.extend(res)
 
     # Новый блок: если есть ошибки, возвращаем status: error
     if any("❌" in msg for msg in results):
