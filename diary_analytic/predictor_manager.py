@@ -20,6 +20,7 @@ import os
 import pandas as pd
 from pprint import pformat
 import joblib
+from diary_analytic.models import Parameter
 
 
 # -------------------------------------------------------------
@@ -48,12 +49,16 @@ class PredictorManager:
     def save_model_coefs(self, model, features, target):
         """
         Сохраняет коэффициенты и признаки модели в CSV-файл для последующего анализа.
+        Теперь в столбце 'feature' выводятся не key, а name.
         """
         predict_logger.info(f"[save_model_coefs] Попытка сохранить коэффициенты. Модель: {type(model)}, features: {features}")
         if model and hasattr(model, "coef_"):
             try:
+                # Получаем отображение key -> name
+                key_to_name = {p.key: p.name for p in Parameter.objects.all()}
+                feature_names = [key_to_name.get(f, f) for f in features]
                 coef_df = pd.DataFrame({
-                    "feature": features,
+                    "feature": feature_names,
                     "coef": model.coef_
                 })
                 coef_df["intercept"] = model.intercept_
