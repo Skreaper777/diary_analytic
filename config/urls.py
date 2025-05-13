@@ -16,11 +16,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from diary_analytic.views import retrain_models_all, get_predictions
+
 from django.shortcuts import redirect
 from datetime import date
 
 
 urlpatterns = [
+    path("get_predictions/", get_predictions, name="get_predictions"),
+    path("retrain_models_all/", retrain_models_all, name="retrain_models_all"),
+
     path('admin/', admin.site.urls),
 
     # ⬇️ 👇 редирект с корня "/" на /add/?date=YYYY-MM-DD

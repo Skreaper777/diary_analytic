@@ -11,6 +11,8 @@ from .utils import get_diary_dataframe, get_today_row
 from .predictor_manager import PredictorManager
 from .loggers import web_logger, db_logger, predict_logger
 import json
+import os
+import traceback
 
 
 # --------------------------------------------------------------------
@@ -278,3 +280,134 @@ def predict(request):
     except Exception as e:
         predict_logger.exception(f"🔥 Ошибка в общей логике /predict/: {str(e)}")
         return JsonResponse({"error": "internal error"}, status=500)
+
+
+# 📡 Обрабатывает GET-запрос на получение прогнозов по всем стратегиям
+@require_GET
+def get_predictions(request: HttpRequest) -> JsonResponse:
+    from .utils import get_today_row
+    import joblib
+    import traceback
+
+    web_logger.debug("[get_predictions] 🔧 Получен запрос на прогнозы: %s", request.GET)
+
+    date_str = request.GET.get("date")
+    if not date_str:
+        web_logger.warning("[get_predictions] ⛔ Отсутствует параметр 'date' в запросе")
+        return JsonResponse({"error": "missing date"}, status=400)
+
+    try:
+        selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        web_logger.debug("[get_predictions] 📆 Преобразована дата: %s", selected_date)
+    except ValueError:
+        web_logger.warning("[get_predictions] ❌ Некорректный формат даты: %s", date_str)
+        return JsonResponse({"error": "invalid date"}, status=400)
+
+    # Получаем строку данных для указанной даты
+    row = get_today_row(selected_date)
+    web_logger.debug(f"[get_predictions] 🧩 Строка признаков на дату {selected_date}: {row}")
+    if row is None or not row:
+        web_logger.warning("[get_predictions] 🚫 Данные на дату %s отсутствуют или пусты", selected_date)
+        return JsonResponse({"error": "no data"}, status=404)
+
+    base_dir = os.path.join(settings.BASE_DIR, "diary_analytic", "trained_models")
+    strategies = ["base", "flags"]  # Здесь можно добавить другие стратегии при необходимости
+    predictions = {}
+
+    web_logger.debug("[get_predictions] 🔍 Стратегии для прогноза: %s", strategies)
+
+    for strategy in strategies:
+        model_dir = os.path.join(base_dir, strategy)
+        web_logger.debug("[get_predictions] 📂 Проверка папки моделей: %s", model_dir)
+
+        if not os.path.exists(model_dir):
+            web_logger.warning("[get_predictions] ⚠️ Папка не найдена: %s", model_dir)
+            continue
+
+        for fname in os.listdir(model_dir):
+            if not fname.endswith(".pkl"):
+                continue
+
+            param_key = fname.replace(".pkl", "")
+            full_key = f"{param_key}_{strategy}"
+            model_path = os.path.join(model_dir, fname)
+
+            try:
+                model = joblib.load(model_path)
+                web_logger.debug(f"[get_predictions] 📦 Загружена модель: {model_path}")
+                # Логируем shape входа и имена признаков
+                if hasattr(model, 'n_features_in_'):
+                    web_logger.debug(f"[get_predictions] Модель {full_key} ожидает признаков: {model.n_features_in_}")
+                if hasattr(model, 'feature_names_in_'):
+                    web_logger.debug(f"[get_predictions] Модель {full_key} ожидает признаки: {model.feature_names_in_}")
+                # Преобразуем row в список признаков в том же порядке, что и при обучении
+                if hasattr(model, 'feature_names_in_'):
+                    X = [row.get(f, 0.0) for f in model.feature_names_in_]
+                    web_logger.debug(f"[get_predictions] Вход для модели {full_key}: {X}")
+                    value = float(model.predict([X])[0])
+                else:
+                    # Fallback: просто все значения row
+                    X = list(row.values())
+                    web_logger.debug(f"[get_predictions] Вход для модели {full_key} (fallback): {X}")
+                    value = float(model.predict([X])[0])
+                predictions[full_key] = round(value, 2)
+                web_logger.debug("[get_predictions] ✅ Прогноз: %s = %.2f", full_key, value)
+            except Exception as e:
+                tb = traceback.format_exc()
+                web_logger.error(f"[get_predictions] ⚠️ Ошибка при прогнозе {full_key}: {e}\n{tb}")
+                predictions[full_key] = None
+
+    web_logger.debug("[get_predictions] 📤 Отправка JSON с %d прогнозами", len(predictions))
+    return JsonResponse(predictions)
+
+# 📦 Обучает модели по всем стратегиям и сохраняет их в отдельные папки
+@csrf_exempt
+@require_POST
+def retrain_models_all(request: HttpRequest) -> JsonResponse:
+    from .utils import get_diary_dataframe
+    import joblib
+
+    web_logger.debug("[retrain] 🔁 Запущено переобучение моделей по всем стратегиям...")
+
+    df = get_diary_dataframe()
+    today = datetime.now().date()
+    df = df[df["date"] < today]
+
+    strategies = [
+        ("base", __import__("diary_analytic.ml_utils.base_model", fromlist=["train_model"]).train_model),
+        ("flags", __import__("diary_analytic.ml_utils.flags_model", fromlist=["train_model"]).train_model),
+    ]
+
+    results = []
+
+    for strategy_name, strategy_fn in strategies:
+        web_logger.debug("[retrain] ▶️ Стратегия: %s", strategy_name)
+
+        model_dir = os.path.join(settings.BASE_DIR, "diary_analytic", "trained_models", strategy_name)
+        os.makedirs(model_dir, exist_ok=True)
+        web_logger.debug("[retrain] 📁 Каталог моделей: %s", model_dir)
+
+        for target in df.columns:
+            if target in ("date", "Дата", "comment"):
+                continue
+
+            try:
+                result = strategy_fn(df.copy(), target=target, exclude=[])
+                model = result.get("model")
+
+                if model:
+                    file_path = os.path.join(model_dir, f"{target}.pkl")
+                    joblib.dump(model, file_path)
+                    msg = f"[{strategy_name}] ✅ Обучено: {target}"
+                    web_logger.info("[retrain] " + msg)
+                    results.append(msg)
+                else:
+                    msg = f"[{strategy_name}] ⚠️ Пропущено: {target}"
+                    web_logger.warning("[retrain] " + msg)
+                    results.append(msg)
+            except Exception as e:
+                msg = f"[{strategy_name}] ❌ Ошибка при обучении {target}: {e}"
+                web_logger.error("[retrain] " + msg)
+                results.append(msg)
+
+    return JsonResponse({"status": "ok", "details": results})

@@ -121,3 +121,65 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'web_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': str(BASE_DIR / 'logs/web.log'),
+            'encoding': 'utf-8',
+        },
+        'predict_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': str(BASE_DIR / 'logs/predict.log'),
+            'encoding': 'utf-8',
+        },
+        'db_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': str(BASE_DIR / 'logs/db.log'),
+            'encoding': 'utf-8',
+        },
+        'error_file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': str(BASE_DIR / 'logs/error.log'),
+            'encoding': 'utf-8',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'web': {
+            'handlers': ['web_file', 'console', 'error_file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'predict': {
+            'handlers': ['predict_file', 'console', 'error_file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'db': {
+            'handlers': ['db_file', 'console', 'error_file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'error': {
+            'handlers': ['error_file', 'console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django': {
+            'handlers': ['console', 'error_file'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
+    },
+}
