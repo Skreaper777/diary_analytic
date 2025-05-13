@@ -70,3 +70,4 @@ local_settings.py
 .vscode/
 *.code-workspace
 *.code-workspace.zip
+other/
