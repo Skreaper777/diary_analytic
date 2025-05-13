@@ -373,7 +373,27 @@
         } catch { return null; }
       }
 
+      // Сброс всех сортировок (визуально и по переменным)
+      function resetAllSortStates(except) {
+        if (except !== 'name') {
+          sortState = 0;
+          sortArrow.textContent = '';
+          sortBtn.classList.remove('active');
+        }
+        if (except !== 'value') {
+          sortStateValue = 0;
+          sortArrowValue.textContent = '';
+          sortBtnValue.classList.remove('active');
+        }
+        if (except !== 'prediction') {
+          sortStatePred = 0;
+          sortArrowPred.textContent = '';
+          sortBtnPred.classList.remove('active');
+        }
+      }
+
       sortBtn.addEventListener('click', function() {
+        resetAllSortStates('name');
         sortState = (sortState + 1) % 3;
         if (sortState === 1) {
           sortByName(1);
@@ -428,6 +448,7 @@
       }
 
       sortBtnValue.addEventListener('click', function() {
+        resetAllSortStates('value');
         sortStateValue = (sortStateValue + 1) % 3;
         // Сбросить состояние у кнопки Имя
         sortState = 0;
@@ -489,6 +510,7 @@
       }
 
       sortBtnPred.addEventListener('click', function() {
+        resetAllSortStates('prediction');
         sortStatePred = (sortStatePred + 1) % 3;
         // Сбросить состояние у других кнопок
         sortState = 0;
