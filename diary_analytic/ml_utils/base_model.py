@@ -72,7 +72,7 @@ def train_model(
         my_test_logger.debug(f"Удалены столбцы с датами: {date_cols}")
 
     # Оставляем только числовые признаки
-    X = X.select_dtypes(include=["number"]).fillna(0.0)
+    # X = X.select_dtypes(include=["number"]).fillna(0.0)
     y = df[target]
 
     # Удаляем строки, где y == NaN

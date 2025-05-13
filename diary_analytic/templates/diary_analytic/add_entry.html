@@ -77,6 +77,12 @@
       margin-bottom: 10px;
     }
 
+    .param-flex-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+    }
+
     .rating-buttons {
       display: flex;
       gap: 10px;
@@ -103,6 +109,46 @@
       background-color: #28a745;
       color: white;
       border-color: #28a745;
+    }
+
+    .value-button.selected[data-value="0"] {
+      background-color: #28a745;
+      border-color: #28a745;
+    }
+
+    .value-button.selected[data-value="1"] {
+      background-color: #7fd428;
+      border-color: #7fd428;
+    }
+
+    .value-button.selected[data-value="2"] {
+      background-color: #e0a800;
+      border-color: #e0a800;
+      color: #222;
+    }
+
+    .value-button.selected[data-value="3"] {
+      background-color: #ff8800;
+      border-color: #ff8800;
+      color: #222;
+    }
+
+    .value-button.selected[data-value="4"] {
+      background-color: #ff3c00;
+      border-color: #ff3c00;
+    }
+
+    .value-button.selected[data-value="5"] {
+      background-color: #dc3545;
+      border-color: #dc3545;
+    }
+
+    .value-button[data-value="1"] {
+      margin-left: 18px;
+    }
+
+    .value-button[data-value="5"] {
+      margin-left: 18px;
     }
 
     .prediction-wrapper {
@@ -142,6 +188,30 @@
       color: #888;
       margin-bottom: 10px;
     }
+
+    .sort-buttons-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 18px;
+      justify-content: flex-end;
+    }
+
+    .sort-btn {
+      background: #222;
+      color: #eee;
+      border: 1.5px solid #444;
+      border-radius: 7px;
+      padding: 7px 18px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border 0.2s;
+    }
+
+    .sort-btn:hover, .sort-btn.active {
+      background: #007bff;
+      color: #fff;
+      border-color: #007bff;
+    }
   </style>
 </head>
 <body>
@@ -167,20 +237,27 @@
     </form>
 
     <!-- Параметры -->
+    <div class="sort-buttons-row">
+      <button type="button" class="sort-btn" data-sort="name">Имя</button>
+      <button type="button" class="sort-btn" data-sort="value">Значение</button>
+      <button type="button" class="sort-btn" data-sort="prediction">Прогноз</button>
+    </div>
+
     {% for param in parameters %}
       <div class="parameter-block" data-key="{{ param.key }}" data-param="{{ param.key }}">
         <div class="param-title">{{ param.name }}</div>
-        <div class="rating-buttons">
-          {% for i in "012345"|make_list %}
-            <button class="value-button{% if values_map|get:param.key|stringformat:'g' == i %} selected{% endif %}" data-value="{{ i }}">{{ i }}</button>
-          {% endfor %}
-        </div>
-
-        <div class="prediction-wrapper">
-          <div class="prediction-block">
-            <div class="prediction-title">Прогноз</div>
-            <div class="predicted" id="predicted-{{ param.key }}">–</div>
-            <div class="predicted-secondary" id="predicted-delta-{{ param.key }}">Δ –</div>
+        <div class="param-flex-row" style="display: flex; align-items: flex-start; gap: 18px;">
+          <div class="rating-buttons">
+            {% for i in "012345"|make_list %}
+              <button class="value-button{% if values_map|get:param.key|stringformat:'g' == i %} selected{% endif %}" data-value="{{ i }}">{{ i }}</button>
+            {% endfor %}
+          </div>
+          <div class="prediction-wrapper" style="margin-top: 0;">
+            <div class="prediction-block">
+              <div class="prediction-title">Прогноз</div>
+              <div class="predicted" id="predicted-{{ param.key }}">–</div>
+              <div class="predicted-secondary" id="predicted-delta-{{ param.key }}">Δ –</div>
+            </div>
           </div>
         </div>
       </div>
