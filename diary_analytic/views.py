@@ -14,7 +14,7 @@ import json
 import os
 import traceback
 from django.conf import settings
-from diary_analytic.ml_utils.base_model import train_model as base_train_model
+from diary_analytic.ml_utils import get_model
 import pandas as pd
 
 
@@ -397,7 +397,7 @@ def retrain_models_all(request: HttpRequest) -> JsonResponse:
     web_logger.info(f"Перед обучением: df.columns = {list(df.columns)}")
 
     strategies = [
-        ("base", base_train_model),
+        ("base", get_model("base").train_model),
     ]
 
     results = []

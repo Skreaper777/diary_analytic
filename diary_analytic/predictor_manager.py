@@ -14,7 +14,7 @@
     - для обучения модели: manager.train(strategy=..., ...)
 """
 
-from .ml_utils import base_model
+from diary_analytic.ml_utils import get_model
 from .loggers import predict_logger
 
 
@@ -52,10 +52,7 @@ class PredictorManager:
         predict_logger.debug(f"🔁 [train] Стратегия: {strategy}, Target: {target}, Исключения: {exclude}")
 
         if strategy == "base":
-            return base_model.train_model(df, target, exclude=exclude)
-
-        elif strategy == "flags":
-            return flags_model.train_model(df, target, exclude=exclude)
+            return get_model("base").train_model(df, target, exclude=exclude)
 
         else:
             raise ValueError(f"❌ Неизвестная стратегия обучения: {strategy}")
@@ -68,7 +65,7 @@ class PredictorManager:
         """
         Выполняет прогноз значения параметра на сегодня.
 
-        :param strategy: название стратегии (например, 'base', 'flags')
+        :param strategy: название стратегии (например, 'base')
         :param model: обученная модель, возвращённая из train()
         :param today_row: словарь значений параметров за сегодня (может быть неполным)
 
@@ -78,10 +75,7 @@ class PredictorManager:
 
         try:
             if strategy == "base":
-                return base_model.predict(model["model"], model["features"], today_row)
-
-            elif strategy == "flags":
-                return flags_model.predict(model["model"], model["features"], today_row)
+                return get_model("base").predict(model["model"], model["features"], today_row)
 
             else:
                 raise ValueError(f"❌ Неизвестная стратегия предсказания: {strategy}")
