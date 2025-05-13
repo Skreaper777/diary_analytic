@@ -76,9 +76,16 @@ def train_model(
     y = df[target]
 
     # Удаляем строки, где y == NaN
-    mask = ~y.isna()
-    X = X[mask]
-    y = y[mask]
+    mask_y = ~y.isna()
+    X = X[mask_y]
+    y = y[mask_y]
+
+    # ⛔️ Удаляем строки, где хотя бы один признак X — NaN
+    mask_X = ~X.isna().any(axis=1)
+    X = X[mask_X]
+    y = y[mask_X]
+    base_model_logger.debug(f"Удалено строк с NaN в признаках: {len(mask_y) - mask_X.sum()}")
+    my_test_logger.debug(f"Удалено строк с NaN в признаках: {len(mask_y) - mask_X.sum()}")
 
     my_test_logger.debug(f"y.name: {y.name}")
     my_test_logger.debug(f"y.dtype: {y.dtype}")
