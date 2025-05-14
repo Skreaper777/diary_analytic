@@ -112,13 +112,17 @@ def add_entry(request: HttpRequest) -> HttpResponse:
     # ----------------------------------------------------------------
     web_logger.debug(f"[add_entry] 📤 Передаём данные в шаблон add_entry.html")
 
-    return render(request, "diary_analytic/add_entry.html", {
-        "form": form,                         # Форма комментария
-        "parameters": parameters,             # Активные параметры
-        "values_map": values_map,             # Обычный dict, сериализация только в шаблоне через json_script
-        "selected_date": selected_date,       # Дата, для которой загружается дневник
-        "today_str": today_str,               # Строка сегодняшней даты (для сравнения в шаблоне)
-    })
+    context = {
+        "form": form,
+        "parameters": parameters,
+        "values_map": values_map,
+        "selected_date": selected_date,
+        "today_str": today_str,
+    }
+    # Добавляем прогнозы по всем моделям
+    context["predictions_by_model"] = get_predictions_by_models(selected_date)
+
+    return render(request, "diary_analytic/add_entry.html", context)
 
 
 # --------------------------------------------------------------------
@@ -380,3 +384,12 @@ def parameter_history(request):
     dates = [d.strftime('%Y-%m-%d') for d in series.index]
     values = series.values.tolist()
     return JsonResponse({'dates': dates, 'values': values})
+
+def get_predictions_by_models(date):
+    model_names = ["base", "flags"]  # список моделей, которые есть
+    predictions = {}
+    for model_name in model_names:
+        manager = PredictorManager(model_name)
+        preds = manager.predict_for_date(date)
+        predictions[model_name] = preds  # {'param1': 1.2, 'param2': 3.1, ...}
+    return predictions

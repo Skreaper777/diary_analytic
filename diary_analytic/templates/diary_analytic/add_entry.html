@@ -78,6 +78,20 @@
       </div>
     {% endfor %}
 
+    <!-- Универсальный блок прогнозов по всем моделям -->
+    {% if predictions_by_model %}
+      {% for model_name, model_predictions in predictions_by_model.items %}
+        <div class="prediction-block model-{{ model_name }}">
+          <h3>Прогнозы по модели <strong>{{ model_name }}</strong></h3>
+          <ul>
+            {% for param, value in model_predictions.items %}
+              <li><strong>{{ param }}</strong>: {{ value|floatformat:2 }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+    {% endif %}
+
     <!-- Комментарий (в самом низу) -->
     <form method="post" style="margin-top: 40px;">
       {% csrf_token %}

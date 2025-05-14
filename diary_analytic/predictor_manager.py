@@ -122,14 +122,58 @@ class PredictorManager:
         :return: float-прогноз (или np.nan/null при невозможности)
         """
         predict_logger.debug(f"📥 [predict_today] Стратегия: {strategy}, Данные: {today_row}")
-        print("1111111111111")
         try:
             if strategy == "base":
                 return get_model("base").predict(model["model"], model["features"], today_row)
-
+            elif strategy == "flags":
+                return get_model("flags").predict(model["model"], model["features"], today_row) 
             else:
                 raise ValueError(f"❌ Неизвестная стратегия предсказания: {strategy}")
 
         except Exception as e:
             predict_logger.error(f"🔥 Ошибка в predict_today (стратегия: {strategy}) — {str(e)}")
             return None
+
+    def predict_for_date(self, date):
+        """
+        Возвращает прогнозы по всем параметрам для выбранной даты.
+        :param date: дата (datetime.date)
+        :return: dict {param_key: value, ...}
+        """
+        from diary_analytic.utils import get_today_row
+        import os
+        import joblib
+        import pandas as pd
+        row = get_today_row(date)
+        predictions = {}
+        # Путь к папке с моделями данной стратегии
+        model_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "diary_analytic", "trained_models", self.strategy)
+        if not os.path.exists(model_dir):
+            return predictions
+        for fname in os.listdir(model_dir):
+            if not fname.endswith(".pkl"):
+                continue
+            param_key = fname.replace(".pkl", "")
+            model_path = os.path.join(model_dir, fname)
+            try:
+                model_dict = joblib.load(model_path)
+                if isinstance(model_dict, dict) and "model" in model_dict:
+                    model = model_dict["model"]
+                    features = model_dict.get("features", None)
+                else:
+                    model = model_dict
+                    features = None
+                # Формируем вход для модели
+                if features is not None:
+                    X = pd.DataFrame([{f: row.get(f, 0.0) for f in features}])
+                    value = float(model.predict(X)[0])
+                elif hasattr(model, 'feature_names_in_'):
+                    X = pd.DataFrame([{f: row.get(f, 0.0) for f in model.feature_names_in_}])
+                    value = float(model.predict(X)[0])
+                else:
+                    X = pd.DataFrame([row])
+                    value = float(model.predict(X)[0])
+                predictions[param_key] = round(value, 2)
+            except Exception as e:
+                predictions[param_key] = None
+        return predictions
