@@ -77,7 +77,7 @@ button[type="submit"]:hover {
   gap: 10px;
   flex-wrap: nowrap;
   margin-bottom: 8px;
-  margin-right: 10px;
+  margin-right: 30px;
 }
 
 .value-button {
@@ -133,12 +133,12 @@ button[type="submit"]:hover {
   border-color: #dc3545;
 }
 
-.value-button[data-value="1"] {
-  margin-left: 18px;
+.value-button[data-value="0"] {
+  margin-right: 13px;
 }
 
 .value-button[data-value="5"] {
-  margin-left: 18px;
+  margin-left: 13px;
 }
 
 .prediction-wrapper {
