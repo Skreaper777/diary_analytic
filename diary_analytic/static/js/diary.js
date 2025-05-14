@@ -690,12 +690,14 @@ async function updateParameterSums() {
   document.querySelectorAll('.parameter-block').forEach(async (block) => {
     const paramKey = block.getAttribute('data-key');
     const sumBlock = block.querySelector('.param-sum-block');
+    const sumBlockRange = block.querySelector('.param-sum-block-range');
     if (!sumBlock) return;
     try {
       const res = await fetch(`/api/parameter_history/?param=${encodeURIComponent(paramKey)}&date=${encodeURIComponent(toDate)}`);
       const data = await res.json();
       if (!data.dates || !data.values || data.dates.length === 0) {
         sumBlock.textContent = '';
+        if (sumBlockRange) sumBlockRange.textContent = '';
         return;
       }
       let filteredValues = data.values;
@@ -706,8 +708,28 @@ async function updateParameterSums() {
       // Суммируем значения (игнорируем null/NaN)
       const sum = filteredValues.reduce((acc, v) => acc + (typeof v === 'number' && !isNaN(v) ? v : 0), 0);
       sumBlock.textContent = sum ? Math.round(sum) : '0';
+      // --- Новый блок: сумма по диапазону дат ---
+      if (sumBlockRange) {
+        // Всегда считаем сумму по диапазону minDate - toDate
+        let rangeValues = data.values;
+        let rangeDates = data.dates;
+        if (minDate && data.dates.includes(minDate)) {
+          const idx = data.dates.indexOf(minDate);
+          rangeValues = data.values.slice(idx);
+          rangeDates = data.dates.slice(idx);
+        }
+        const rangeSum = rangeValues.reduce((acc, v) => acc + (typeof v === 'number' && !isNaN(v) ? v : 0), 0);
+        const daysCount = rangeDates.length;
+        if (daysCount > 0) {
+          const percent = Math.round((rangeSum / (4 * daysCount)) * 100);
+          sumBlockRange.textContent = percent + '%';
+        } else {
+          sumBlockRange.textContent = '–';
+        }
+      }
     } catch {
       sumBlock.textContent = '';
+      if (sumBlockRange) sumBlockRange.textContent = '';
     }
   });
 }
