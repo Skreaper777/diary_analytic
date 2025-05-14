@@ -62,14 +62,14 @@
     {% for param in parameters %}
       <div class="parameter-block" data-key="{{ param.key }}" data-param="{{ param.key }}">
         <div class="param-title">{{ param.name }}</div>
-        <div class="param-flex-row" style="display: flex; align-items: flex-start; gap: 18px;">
+        <div class="param-flex-row" style="display: flex; align-items: flex-start;">
           <div class="rating-buttons">
             {% for i in "012345"|make_list %}
               <button class="value-button{% if values_map|get:param.key|stringformat:'g' == i %} selected{% endif %}" data-value="{{ i }}">{{ i }}</button>
             {% endfor %}
           </div>
-          <div class="param-sum-block" id="param-sum-{{ param.key }}" style="min-width: 25px; height: 2.5rem; display: flex; align-items: center; justify-content: center; background:rgba(0, 123, 255, 0.29); color: #eee; border: 2px solid #007bff; border-radius: 6px; font-size: 1em; margin-left: 0px; padding: 0 10px; font-weight: bold;"></div>
-          <div class="param-sum-block-range" id="param-sum-range-{{ param.key }}" style="min-width: 25px; height: 2.5rem; display: flex; align-items: center; justify-content: center; background:rgba(40, 167, 70, 0.66); color: #eee; border: 2px solid #28a745; border-radius: 6px; font-size: 1em; margin-left: 0px; padding: 0 10px; font-weight: bold;">–</div>
+          <div class="param-sum-block" id="param-sum-{{ param.key }}" style="min-width: 25px; height: 2.5rem; display: flex; align-items: center; justify-content: center; background:rgba(0, 123, 255, 0.29); color: #eee; border: 2px solid #007bff; border-radius: 6px; font-size: 1em; margin-right: 10px; padding: 0 10px; font-weight: bold;"></div>
+          <div class="param-sum-block-range" id="param-sum-range-{{ param.key }}" style="min-width: 25px; height: 2.5rem; display: flex; align-items: center; justify-content: center; background:rgba(40, 167, 70, 0.66); color: #eee; border: 2px solid #28a745; border-radius: 6px; font-size: 1em; margin-right: 10px; padding: 0 10px; font-weight: bold;">–</div>
           <div class="prediction-wrapper" style="margin-top: 0;">
             <div class="prediction-block">
               <div class="prediction-title">Прогноз</div>
