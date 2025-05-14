@@ -329,6 +329,7 @@ button[type="submit"]:hover {
     padding: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
+    overflow: hidden;
   }
   .parameter-block {
     width: 93vw !important;
