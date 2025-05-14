@@ -68,7 +68,7 @@
               <button class="value-button{% if values_map|get:param.key|stringformat:'g' == i %} selected{% endif %}" data-value="{{ i }}">{{ i }}</button>
             {% endfor %}
           </div>
-          <div class="param-sum-block" id="param-sum-{{ param.key }}" style="min-width: 25px; height: 2.5rem; display: flex; align-items: center; justify-content: center; background:rgba(0, 123, 255, 0.29); color: #eee; border: 2px solid #007bff; border-radius: 6px; font-size: 1em; margin-left: 10px; padding: 0 10px; font-weight: bold;"></div>
+          <div class="param-sum-block" id="param-sum-{{ param.key }}" style="min-width: 25px; height: 2.5rem; display: flex; align-items: center; justify-content: center; background:rgba(0, 123, 255, 0.29); color: #eee; border: 2px solid #007bff; border-radius: 6px; font-size: 1em; margin-left: 0px; padding: 0 10px; font-weight: bold;"></div>
           <div class="param-sum-block-range" id="param-sum-range-{{ param.key }}" style="min-width: 25px; height: 2.5rem; display: flex; align-items: center; justify-content: center; background:rgba(40, 167, 70, 0.66); color: #eee; border: 2px solid #28a745; border-radius: 6px; font-size: 1em; margin-left: 0px; padding: 0 10px; font-weight: bold;">–</div>
           <div class="prediction-wrapper" style="margin-top: 0;">
             <div class="prediction-block">
