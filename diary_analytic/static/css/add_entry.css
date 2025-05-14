@@ -60,9 +60,10 @@ button[type="submit"]:hover {
 }
 
 .param-title {
-  font-weight: bold;
-  margin-bottom: 20px;
+  font-weight: 500;
+  margin: 10px 0 20px 0;
   font-size: 1.5em;
+  color: rgba(255, 255, 255, 0.754);
 }
 
 .param-flex-row {
