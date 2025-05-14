@@ -115,7 +115,7 @@ def add_entry(request: HttpRequest) -> HttpResponse:
     return render(request, "diary_analytic/add_entry.html", {
         "form": form,                         # Форма комментария
         "parameters": parameters,             # Активные параметры
-        "values_map": values_map,             # Словарь: { "toshn": 2.0, "ustalost": 1.0 }
+        "values_map": values_map,             # Обычный dict, сериализация только в шаблоне через json_script
         "selected_date": selected_date,       # Дата, для которой загружается дневник
         "today_str": today_str,               # Строка сегодняшней даты (для сравнения в шаблоне)
     })

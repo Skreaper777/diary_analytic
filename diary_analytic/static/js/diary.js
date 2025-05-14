@@ -1,7 +1,11 @@
 document.addEventListener("DOMContentLoaded", async function () {
   console.log("🔄 Инициализация страницы...");
-  console.log("📦 Значения из бэкенда:", window.VALUES_MAP);
-  
+
+  // забираем JSON из data-атрибута
+  const VALUES_MAP = JSON.parse(document.body.dataset.valuesMap || "{}");
+  window.VALUES_MAP = VALUES_MAP;
+  console.log("📦 Значения из бэкенда:", VALUES_MAP);
+
   // Получаем дату из input
   const dateInput = document.getElementById("date-input");
   const dateValue = dateInput ? dateInput.value : "";
@@ -729,3 +733,214 @@ function loadSortState() {
     return JSON.parse(localStorage.getItem('diary_sort'));
   } catch { return null; }
 }
+
+(function() {
+  // Получаем кнопки сортировки и стрелочки
+  const sortBtn = document.querySelector('.sort-btn[data-sort="name"]');
+  const sortArrow = sortBtn ? sortBtn.querySelector('.sort-arrow') : null;
+  const sortBtnValue = document.querySelector('.sort-btn[data-sort="value"]');
+  const sortArrowValue = sortBtnValue ? sortBtnValue.querySelector('.sort-arrow') : null;
+  const sortBtnPred = document.querySelector('.sort-btn[data-sort="prediction"]');
+  const sortArrowPred = sortBtnPred ? sortBtnPred.querySelector('.sort-arrow') : null;
+
+  let sortState = 0, sortStateValue = 0, sortStatePred = 0;
+
+  function getParamBlocks() {
+    return Array.from(document.querySelectorAll('.parameter-block'));
+  }
+
+  function moveCommentFormToBottom() {
+    const form = document.querySelector('form[method="post"]');
+    const container = document.querySelector('.container');
+    if (form && container) container.appendChild(form);
+  }
+
+  function sortByName(direction) {
+    const blocks = getParamBlocks();
+    blocks.sort((a, b) => {
+      const nameA = a.querySelector('.param-title').textContent.trim().toLowerCase();
+      const nameB = b.querySelector('.param-title').textContent.trim().toLowerCase();
+      if (nameA < nameB) return direction === 1 ? -1 : 1;
+      if (nameA > nameB) return direction === 1 ? 1 : -1;
+      return 0;
+    });
+    const parent = blocks[0].parentNode;
+    blocks.forEach(block => parent.appendChild(block));
+    moveCommentFormToBottom();
+  }
+
+  function getSelectedValue(block) {
+    const btn = block.querySelector('.value-button.selected');
+    if (!btn) return -1;
+    return parseInt(btn.getAttribute('data-value'), 10);
+  }
+
+  function sortByValue(direction) {
+    const blocks = getParamBlocks();
+    blocks.sort((a, b) => {
+      const valA = getSelectedValue(a);
+      const valB = getSelectedValue(b);
+      if (valA < valB) return direction === 1 ? -1 : 1;
+      if (valA > valB) return direction === 1 ? 1 : -1;
+      return 0;
+    });
+    const parent = blocks[0].parentNode;
+    blocks.forEach(block => parent.appendChild(block));
+    moveCommentFormToBottom();
+  }
+
+  function getPredictionValue(block) {
+    const pred = block.querySelector('.predicted');
+    if (!pred) return -Infinity;
+    const val = pred.textContent.trim().replace(',', '.');
+    const match = val.match(/([\d\.\-]+)/);
+    if (!match) return -Infinity;
+    const num = parseFloat(match[1]);
+    return isNaN(num) ? -Infinity : num;
+  }
+
+  function sortByPrediction(direction) {
+    const blocks = getParamBlocks();
+    blocks.sort((a, b) => {
+      const valA = getPredictionValue(a);
+      const valB = getPredictionValue(b);
+      if (valA < valB) return direction === 1 ? -1 : 1;
+      if (valA > valB) return direction === 1 ? 1 : -1;
+      return 0;
+    });
+    const parent = blocks[0].parentNode;
+    blocks.forEach(block => parent.appendChild(block));
+    moveCommentFormToBottom();
+  }
+
+  function resetAllSortStates(except) {
+    if (except !== 'name') {
+      sortState = 0;
+      if (sortArrow) sortArrow.textContent = '';
+      if (sortBtn) sortBtn.classList.remove('active');
+    }
+    if (except !== 'value') {
+      sortStateValue = 0;
+      if (sortArrowValue) sortArrowValue.textContent = '';
+      if (sortBtnValue) sortBtnValue.classList.remove('active');
+    }
+    if (except !== 'prediction') {
+      sortStatePred = 0;
+      if (sortArrowPred) sortArrowPred.textContent = '';
+      if (sortBtnPred) sortBtnPred.classList.remove('active');
+    }
+  }
+
+  function updateArrow() {
+    if (!sortArrow) return;
+    if (sortState === 1) {
+      sortArrow.textContent = '▲';
+      sortBtn.classList.add('active');
+    } else if (sortState === 2) {
+      sortArrow.textContent = '▼';
+      sortBtn.classList.add('active');
+    } else {
+      sortArrow.textContent = '';
+      sortBtn.classList.remove('active');
+    }
+  }
+  function updateArrowValue() {
+    if (!sortArrowValue) return;
+    if (sortStateValue === 1) {
+      sortArrowValue.textContent = '▲';
+      sortBtnValue.classList.add('active');
+    } else if (sortStateValue === 2) {
+      sortArrowValue.textContent = '▼';
+      sortBtnValue.classList.add('active');
+    } else {
+      sortArrowValue.textContent = '';
+      sortBtnValue.classList.remove('active');
+    }
+  }
+  function updateArrowPred() {
+    if (!sortArrowPred) return;
+    if (sortStatePred === 1) {
+      sortArrowPred.textContent = '▲';
+      sortBtnPred.classList.add('active');
+    } else if (sortStatePred === 2) {
+      sortArrowPred.textContent = '▼';
+      sortBtnPred.classList.add('active');
+    } else {
+      sortArrowPred.textContent = '';
+      sortBtnPred.classList.remove('active');
+    }
+  }
+
+  // Навешиваем обработчики
+  if (sortBtn) {
+    sortBtn.addEventListener('click', function() {
+      resetAllSortStates('name');
+      sortState = (sortState + 1) % 3;
+      if (sortState === 1) {
+        sortByName(1);
+        saveSortState('name', 1);
+      } else if (sortState === 2) {
+        sortByName(-1);
+        saveSortState('name', -1);
+      } else {
+        window.location.reload();
+        clearSortState();
+      }
+      updateArrow();
+    });
+  }
+  if (sortBtnValue) {
+    sortBtnValue.addEventListener('click', function() {
+      resetAllSortStates('value');
+      sortStateValue = (sortStateValue + 1) % 3;
+      if (sortStateValue === 1) {
+        sortByValue(1);
+        saveSortState('value', 1);
+      } else if (sortStateValue === 2) {
+        sortByValue(-1);
+        saveSortState('value', -1);
+      } else {
+        window.location.reload();
+        clearSortState();
+      }
+      updateArrowValue();
+    });
+  }
+  if (sortBtnPred) {
+    sortBtnPred.addEventListener('click', function() {
+      resetAllSortStates('prediction');
+      sortStatePred = (sortStatePred + 1) % 3;
+      if (sortStatePred === 1) {
+        sortByPrediction(1);
+        saveSortState('prediction', 1);
+      } else if (sortStatePred === 2) {
+        sortByPrediction(-1);
+        saveSortState('prediction', -1);
+      } else {
+        window.location.reload();
+        clearSortState();
+      }
+      updateArrowPred();
+    });
+  }
+
+  // Восстановление сортировки при загрузке страницы
+  document.addEventListener('DOMContentLoaded', function() {
+    const state = loadSortState && loadSortState();
+    if (!state) return;
+    if (state.type === 'name') {
+      sortState = state.direction === 1 ? 1 : 2;
+      sortByName(state.direction);
+      updateArrow();
+    } else if (state.type === 'value') {
+      sortStateValue = state.direction === 1 ? 1 : 2;
+      sortByValue(state.direction);
+      updateArrowValue();
+    } else if (state.type === 'prediction') {
+      sortStatePred = state.direction === 1 ? 1 : 2;
+      sortByPrediction(state.direction);
+      updateArrowPred();
+    }
+  });
+
+})();

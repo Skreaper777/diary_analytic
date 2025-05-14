@@ -1,18 +1,24 @@
 {% load static %}
 {% load diary_filters %}
 {% load diary_tags %}
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <title>Форма дневника состояния</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script>
-    window.VALUES_MAP = {{ values_map|safe }};
-  </script>
   <link rel="stylesheet" href="{% static 'css/add_entry.css' %}">
 </head>
 <body>
+  <script id="values-map" type="application/json">
+    {{ values_map|json_script:"values-map" }}
+  </script>
+  <script>
+    const VALUES_MAP = JSON.parse(document.getElementById('values-map').textContent);
+    window.VALUES_MAP = VALUES_MAP;
+  </script>
   <div class="container">
     <h2>📘 Дневник состояния — {{ selected_date }}</h2>
     <div class="date-selector" style="margin-bottom: 28px; margin-top: 0; display: flex; justify-content: flex-end;">
@@ -82,248 +88,6 @@
 
   <script src="{% static 'js/diary.js' %}"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script>
-    (function() {
-      const sortBtn = document.querySelector('.sort-btn[data-sort="name"]');
-      const sortArrow = sortBtn.querySelector('.sort-arrow');
-      const paramContainer = sortBtn.closest('.container');
-      let sortState = 0; // 0 - нет сортировки, 1 - по возрастанию, 2 - по убыванию
-
-      // Собираем все блоки параметров
-      function getParamBlocks() {
-        return Array.from(paramContainer.querySelectorAll('.parameter-block'));
-      }
-
-      // Сортировка по имени
-      function sortByName(direction) {
-        const blocks = getParamBlocks();
-        blocks.sort((a, b) => {
-          const nameA = a.querySelector('.param-title').textContent.trim().toLowerCase();
-          const nameB = b.querySelector('.param-title').textContent.trim().toLowerCase();
-          if (nameA < nameB) return direction === 1 ? -1 : 1;
-          if (nameA > nameB) return direction === 1 ? 1 : -1;
-          return 0;
-        });
-        // Вставляем отсортированные блоки обратно
-        const firstBlock = blocks[0];
-        const parent = firstBlock.parentNode;
-        blocks.forEach(block => parent.appendChild(block));
-        moveCommentFormToBottom();
-      }
-
-      function resetOrder() {
-        // Перезагрузить страницу для сброса сортировки
-        window.location.reload();
-      }
-
-      function updateArrow() {
-        if (sortState === 1) {
-          sortArrow.textContent = '▲';
-          sortBtn.classList.add('active');
-        } else if (sortState === 2) {
-          sortArrow.textContent = '▼';
-          sortBtn.classList.add('active');
-        } else {
-          sortArrow.textContent = '';
-          sortBtn.classList.remove('active');
-        }
-      }
-
-      // --- Сохранение и восстановление сортировки ---
-      function saveSortState(type, direction) {
-        localStorage.setItem('diary_sort', JSON.stringify({type, direction}));
-      }
-      function clearSortState() {
-        localStorage.removeItem('diary_sort');
-      }
-      function loadSortState() {
-        try {
-          return JSON.parse(localStorage.getItem('diary_sort'));
-        } catch { return null; }
-      }
-
-      // Сброс всех сортировок (визуально и по переменным)
-      function resetAllSortStates(except) {
-        if (except !== 'name') {
-          sortState = 0;
-          sortArrow.textContent = '';
-          sortBtn.classList.remove('active');
-        }
-        if (except !== 'value') {
-          sortStateValue = 0;
-          sortArrowValue.textContent = '';
-          sortBtnValue.classList.remove('active');
-        }
-        if (except !== 'prediction') {
-          sortStatePred = 0;
-          sortArrowPred.textContent = '';
-          sortBtnPred.classList.remove('active');
-        }
-      }
-
-      sortBtn.addEventListener('click', function() {
-        resetAllSortStates('name');
-        sortState = (sortState + 1) % 3;
-        if (sortState === 1) {
-          sortByName(1);
-          saveSortState('name', 1);
-        } else if (sortState === 2) {
-          sortByName(-1);
-          saveSortState('name', -1);
-        } else {
-          resetOrder();
-          clearSortState();
-        }
-        updateArrow();
-      });
-
-      // --- Сортировка по значению ---
-      const sortBtnValue = document.querySelector('.sort-btn[data-sort="value"]');
-      const sortArrowValue = sortBtnValue.querySelector('.sort-arrow');
-      let sortStateValue = 0;
-
-      function getSelectedValue(block) {
-        const btn = block.querySelector('.value-button.selected');
-        if (!btn) return -1;
-        return parseInt(btn.getAttribute('data-value'), 10);
-      }
-
-      function sortByValue(direction) {
-        const blocks = getParamBlocks();
-        blocks.sort((a, b) => {
-          const valA = getSelectedValue(a);
-          const valB = getSelectedValue(b);
-          if (valA < valB) return direction === 1 ? -1 : 1;
-          if (valA > valB) return direction === 1 ? 1 : -1;
-          return 0;
-        });
-        const firstBlock = blocks[0];
-        const parent = firstBlock.parentNode;
-        blocks.forEach(block => parent.appendChild(block));
-        moveCommentFormToBottom();
-      }
-
-      function updateArrowValue() {
-        if (sortStateValue === 1) {
-          sortArrowValue.textContent = '▲';
-          sortBtnValue.classList.add('active');
-        } else if (sortStateValue === 2) {
-          sortArrowValue.textContent = '▼';
-          sortBtnValue.classList.add('active');
-        } else {
-          sortArrowValue.textContent = '';
-          sortBtnValue.classList.remove('active');
-        }
-      }
-
-      sortBtnValue.addEventListener('click', function() {
-        resetAllSortStates('value');
-        sortStateValue = (sortStateValue + 1) % 3;
-        // Сбросить состояние у кнопки Имя
-        sortState = 0;
-        updateArrow();
-        if (sortStateValue === 1) {
-          sortByValue(1);
-          saveSortState('value', 1);
-        } else if (sortStateValue === 2) {
-          sortByValue(-1);
-          saveSortState('value', -1);
-        } else {
-          resetOrder();
-          clearSortState();
-        }
-        updateArrowValue();
-      });
-
-      // --- Сортировка по прогнозу ---
-      const sortBtnPred = document.querySelector('.sort-btn[data-sort="prediction"]');
-      const sortArrowPred = sortBtnPred.querySelector('.sort-arrow');
-      let sortStatePred = 0;
-
-      function getPredictionValue(block) {
-        const pred = block.querySelector('.predicted');
-        if (!pred) return -Infinity;
-        const val = pred.textContent.trim().replace(',', '.');
-        const match = val.match(/([\d\.\-]+)/);
-        if (!match) return -Infinity;
-        const num = parseFloat(match[1]);
-        return isNaN(num) ? -Infinity : num;
-      }
-
-      function sortByPrediction(direction) {
-        const blocks = getParamBlocks();
-        blocks.sort((a, b) => {
-          const valA = getPredictionValue(a);
-          const valB = getPredictionValue(b);
-          if (valA < valB) return direction === 1 ? -1 : 1;
-          if (valA > valB) return direction === 1 ? 1 : -1;
-          return 0;
-        });
-        const firstBlock = blocks[0];
-        const parent = firstBlock.parentNode;
-        blocks.forEach(block => parent.appendChild(block));
-        moveCommentFormToBottom();
-      }
-
-      function updateArrowPred() {
-        if (sortStatePred === 1) {
-          sortArrowPred.textContent = '▲';
-          sortBtnPred.classList.add('active');
-        } else if (sortStatePred === 2) {
-          sortArrowPred.textContent = '▼';
-          sortBtnPred.classList.add('active');
-        } else {
-          sortArrowPred.textContent = '';
-          sortBtnPred.classList.remove('active');
-        }
-      }
-
-      sortBtnPred.addEventListener('click', function() {
-        resetAllSortStates('prediction');
-        sortStatePred = (sortStatePred + 1) % 3;
-        // Сбросить состояние у других кнопок
-        sortState = 0;
-        sortStateValue = 0;
-        updateArrow();
-        updateArrowValue();
-        if (sortStatePred === 1) {
-          sortByPrediction(1);
-          saveSortState('prediction', 1);
-        } else if (sortStatePred === 2) {
-          sortByPrediction(-1);
-          saveSortState('prediction', -1);
-        } else {
-          resetOrder();
-          clearSortState();
-        }
-        updateArrowPred();
-      });
-
-      // Перемещает форму комментария в конец контейнера
-      function moveCommentFormToBottom() {
-        const form = paramContainer.querySelector('form[method="post"]');
-        if (form) paramContainer.appendChild(form);
-      }
-
-      // --- Восстановление сортировки при загрузке страницы ---
-      document.addEventListener('DOMContentLoaded', function() {
-        const state = loadSortState();
-        if (!state) return;
-        if (state.type === 'name') {
-          sortState = state.direction === 1 ? 1 : 2;
-          sortByName(state.direction);
-          updateArrow();
-        } else if (state.type === 'value') {
-          sortStateValue = state.direction === 1 ? 1 : 2;
-          sortByValue(state.direction);
-          updateArrowValue();
-        } else if (state.type === 'prediction') {
-          sortStatePred = state.direction === 1 ? 1 : 2;
-          sortByPrediction(state.direction);
-          updateArrowPred();
-        }
-      });
-    })();
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 </body>
 </html>
