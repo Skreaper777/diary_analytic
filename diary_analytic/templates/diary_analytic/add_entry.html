@@ -39,18 +39,24 @@
         <button type="button" class="sort-btn" data-sort="sum">Сумма <span class="sort-arrow"></span></button>
         <button type="button" class="sort-btn" data-sort="prediction">Прогноз <span class="sort-arrow"></span></button>
       </div>
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <button type="button" class="charts-toggle-btn" id="predictions-toggle-btn">Прогноз</button>
-      </div>
+
     </div>
+
     <div id="charts-date-range-block" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; max-width: 340px;">
+      <button type="button" class="charts-toggle-btn" id="predictions-toggle-btn">Прогноз</button>
       <button type="button" class="charts-toggle-btn" id="charts-toggle-btn" style="margin-left:0;">Графики</button>
       <label for="charts-min-date" style="color:#bbb;font-size:0.98em; margin-left: 8px;">С&nbsp;даты:</label>
       <input type="date" id="charts-min-date" style="background:#222;color:#eee;border:1.5px solid #444;border-radius:8px;padding:7px 12px;font-size:1em;outline:none;" />
     </div>
 
-    <div class="filter-row" style="margin-top: 35px; margin-bottom: 35px; display: flex; justify-content: flex-start;">
+    <div class="filter-row" style="margin-top: 35px; margin-bottom: 35px; display: flex; justify-content: flex-start; align-items: center; gap: 8px;">
       <input id="param-filter-input" type="text" placeholder="Фильтр параметров..." autocomplete="off" />
+      <button type="button" class="filter-clear-btn" aria-label="Очистить фильтр" title="Очистить фильтр" style="display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; border: none; background: #eee; color: #888; font-size: 1.2em; cursor: pointer; margin-left: 4px;">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="8" cy="8" r="8" fill="#eee"/>
+          <path d="M5.5 5.5L10.5 10.5M10.5 5.5L5.5 10.5" stroke="#888" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
     </div>
 
     {% for param in parameters %}
@@ -62,8 +68,8 @@
               <button class="value-button{% if values_map|get:param.key|stringformat:'g' == i %} selected{% endif %}" data-value="{{ i }}">{{ i }}</button>
             {% endfor %}
           </div>
-          <div class="param-sum-block" id="param-sum-{{ param.key }}" style="min-width: 40px; height: 2.5rem; display: flex; align-items: center; justify-content: center; background: #007bff; color: #eee; border: 2px solid #007bff; border-radius: 6px; font-size: 1em; margin-left: 10px; padding: 0 14px; font-weight: bold;"></div>
-          <div class="param-sum-block-range" id="param-sum-range-{{ param.key }}" style="min-width: 40px; height: 2.5rem; display: flex; align-items: center; justify-content: center; background: #28a745; color: #eee; border: 2px solid #28a745; border-radius: 6px; font-size: 1em; margin-left: 10px; padding: 0 14px; font-weight: bold;">–</div>
+          <div class="param-sum-block" id="param-sum-{{ param.key }}" style="min-width: 25px; height: 2.5rem; display: flex; align-items: center; justify-content: center; background:rgba(0, 123, 255, 0.29); color: #eee; border: 2px solid #007bff; border-radius: 6px; font-size: 1em; margin-left: 10px; padding: 0 10px; font-weight: bold;"></div>
+          <div class="param-sum-block-range" id="param-sum-range-{{ param.key }}" style="min-width: 25px; height: 2.5rem; display: flex; align-items: center; justify-content: center; background:rgba(40, 167, 70, 0.66); color: #eee; border: 2px solid #28a745; border-radius: 6px; font-size: 1em; margin-left: 0px; padding: 0 10px; font-weight: bold;">–</div>
           <div class="prediction-wrapper" style="margin-top: 0;">
             <div class="prediction-block">
               <div class="prediction-title">Прогноз</div>

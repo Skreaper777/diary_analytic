@@ -456,7 +456,36 @@ async function loadParameterHistory(paramKey, dateStr) {
               return v >= 3 ? 'rgba(224,168,0,0.10)' : 'rgba(40,167,69,0.10)';
             }
           }
-        }]
+        },
+        // --- Линия тренда ---
+        {
+          label: 'Тренд',
+          data: (function() {
+            // Линейная регрессия по filteredValues
+            const n = filteredValues.length;
+            if (n < 2) return Array(n).fill(null);
+            let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+            for (let i = 0; i < n; i++) {
+              sumX += i;
+              sumY += filteredValues[i];
+              sumXY += i * filteredValues[i];
+              sumXX += i * i;
+            }
+            const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+            return Array.from({length: n}, (_, i) => Math.round((slope * i + intercept) * 100) / 100);
+          })(),
+          borderColor: 'rgba(255,152,0,0.30)',
+          backgroundColor: 'rgba(255,152,0,0.10)',
+          borderWidth: 1,
+          borderDash: [5, 5],
+          pointRadius: 0,
+          fill: false,
+          tension: 0,
+          spanGaps: true,
+          order: 2,
+        }
+        ]
       },
       options: {
         responsive: true,
@@ -582,6 +611,16 @@ function setupParamFilterInput() {
     filterParameterBlocks(this.value);
     saveParamFilterState(this.value);
   });
+  // --- Кнопка очистки фильтра ---
+  const clearBtn = document.querySelector('.filter-clear-btn');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', function() {
+      input.value = '';
+      filterParameterBlocks('');
+      saveParamFilterState('');
+      input.focus();
+    });
+  }
 }
 
 // --- Сортировка: инверсия стрелочек ---
