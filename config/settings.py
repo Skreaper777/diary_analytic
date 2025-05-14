@@ -27,7 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['150.241.74.139', 'peppy-toad.aeza.network']
 
-
 # Application definition
 
 INSTALLED_APPS = [
