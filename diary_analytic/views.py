@@ -329,7 +329,7 @@ def retrain_models_all(request: HttpRequest) -> JsonResponse:
 
     web_logger.info(f"Перед обучением: df.columns = {list(df.columns)}")
 
-    strategies = ["base"]  # сюда легко добавлять новые стратегии
+    strategies = ["base", "flags"]  # теперь обе модели!
     results = []
 
     from .predictor_manager import PredictorManager

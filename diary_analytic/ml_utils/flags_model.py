@@ -10,17 +10,17 @@ logger = logging.getLogger(__name__)
 logs_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs')
 os.makedirs(logs_dir, exist_ok=True)
 my_test_log_path = os.path.join(logs_dir, 'my_test.log')
-base_model_log_path = os.path.join(logs_dir, 'base_model.log')
+flags_model_log_path = os.path.join(logs_dir, 'flags_model.log')
 
-# Логгер для base_model.log
-base_model_logger = logging.getLogger("base_model")
-base_model_logger.handlers.clear()
-base_model_logger.propagate = False  # Отключаем передачу логов root-логгеру
+# Логгер для flags_model.log
+flags_model_logger = logging.getLogger("flags_model")
+flags_model_logger.handlers.clear()
+flags_model_logger.propagate = False  # Отключаем передачу логов root-логгеру
 try:
-    base_model_handler = logging.FileHandler(base_model_log_path, mode="a", encoding="utf-8")
-    base_model_handler.setFormatter(logging.Formatter("[%(asctime)s] %(message)s"))
-    base_model_logger.addHandler(base_model_handler)
-    base_model_logger.setLevel(logging.DEBUG)
+    flags_model_handler = logging.FileHandler(flags_model_log_path, mode="a", encoding="utf-8")
+    flags_model_handler.setFormatter(logging.Formatter("[%(asctime)s] %(message)s"))
+    flags_model_logger.addHandler(flags_model_handler)
+    flags_model_logger.setLevel(logging.DEBUG)
 except Exception as e:
     # Если не удалось создать логгер, ничего не делаем
     pass
@@ -34,7 +34,7 @@ try:
     my_test_logger.addHandler(my_test_handler)
     my_test_logger.setLevel(logging.DEBUG)
 except Exception as e:
-    base_model_logger.error("Ошибка при создании my_test_handler: %s", e)
+    flags_model_logger.error("Ошибка при создании my_test_handler: %s", e)
 
 DROP_ALWAYS = ["date", "Дата", "дата", "index"]
 
@@ -44,7 +44,7 @@ def train_model(
     *,
     exclude: list[str] | None = None,
 ):
-    base_model_logger.info("=== train_model вызван для target=%s ===", target)
+    flags_model_logger.info("=== train_model вызван для target=%s ===", target)
     my_test_logger.debug("=== train_model вызван для target=%s ===", target)
     if exclude is None:
         exclude = []
@@ -53,14 +53,14 @@ def train_model(
     X = df.drop(columns=drop_cols, errors="ignore")
 
     # Логируем shape и типы исходных данных
-    base_model_logger.debug(f"=== train_model: target={target} ===")
-    base_model_logger.debug(f"df.shape: {df.shape}")
-    base_model_logger.debug(f"df.dtypes: {df.dtypes}")
-    base_model_logger.debug(f"df.head():\n{df.head()}\n")
-    base_model_logger.debug(f"X.shape: {X.shape}")
-    base_model_logger.debug(f"X.dtypes: {X.dtypes}")
-    base_model_logger.debug(f"X.head():\n{X.head()}\n")
-    base_model_logger.debug(f"X unique types: {[set(type(x) for x in X[col]) for col in X.columns]}")
+    flags_model_logger.debug(f"=== train_model: target={target} ===")
+    flags_model_logger.debug(f"df.shape: {df.shape}")
+    flags_model_logger.debug(f"df.dtypes: {df.dtypes}")
+    flags_model_logger.debug(f"df.head():\n{df.head()}\n")
+    flags_model_logger.debug(f"X.shape: {X.shape}")
+    flags_model_logger.debug(f"X.dtypes: {X.dtypes}")
+    flags_model_logger.debug(f"X.head():\n{X.head()}\n")
+    flags_model_logger.debug(f"X unique types: {[set(type(x) for x in X[col]) for col in X.columns]}")
 
     # Удаляем все столбцы, где есть хотя бы одно значение типа date/datetime
     def has_date_value(series):
@@ -84,7 +84,7 @@ def train_model(
     mask_X = ~X.isna().any(axis=1)
     X = X[mask_X]
     y = y[mask_X]
-    base_model_logger.debug(f"Удалено строк с NaN в признаках: {len(mask_y) - mask_X.sum()}")
+    flags_model_logger.debug(f"Удалено строк с NaN в признаках: {len(mask_y) - mask_X.sum()}")
     my_test_logger.debug(f"Удалено строк с NaN в признаках: {len(mask_y) - mask_X.sum()}")
 
     my_test_logger.debug(f"y.name: {y.name}")
