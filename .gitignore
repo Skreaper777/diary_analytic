@@ -66,9 +66,7 @@ config.yaml
 local_settings.py
 
 *.xlsx
-*.pkl
 .vscode/
 *.code-workspace
 *.code-workspace.zip
 other/
-*.csv
