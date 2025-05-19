@@ -65,8 +65,6 @@ secrets.json
 config.yaml
 local_settings.py
 
-*.xlsx
 .vscode/
 *.code-workspace
 *.code-workspace.zip
-other/
