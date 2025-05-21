@@ -587,10 +587,26 @@ function filterParameterBlocks(filter) {
     return;
   }
   const terms = filter.toLowerCase().split(/\s+/).filter(Boolean);
+  
+  // Разделяем термины на включаемые и исключаемые
+  const includedTerms = terms.filter(term => !term.startsWith('-'));
+  const excludedTerms = terms
+    .filter(term => term.startsWith('-'))
+    .map(term => term.slice(1)); // Убираем символ '-'
+  
   blocks.forEach(block => {
     const title = block.querySelector('.param-title').textContent.toLowerCase();
-    const match = terms.every(term => title.includes(term));
-    block.style.display = match ? '' : 'none';
+    
+    // Проверяем, что все включаемые термины присутствуют
+    const hasAllIncluded = includedTerms.length === 0 || 
+      includedTerms.every(term => title.includes(term));
+    
+    // Проверяем, что ни один исключаемый термин не присутствует
+    const hasNoExcluded = excludedTerms.length === 0 || 
+      !excludedTerms.some(term => title.includes(term));
+    
+    // Отображаем блок только если он удовлетворяет обоим условиям
+    block.style.display = (hasAllIncluded && hasNoExcluded) ? '' : 'none';
   });
 }
 
