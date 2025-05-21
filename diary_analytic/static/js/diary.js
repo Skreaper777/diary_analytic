@@ -589,7 +589,7 @@ function filterParameterBlocks(filter) {
   const terms = filter.toLowerCase().split(/\s+/).filter(Boolean);
   blocks.forEach(block => {
     const title = block.querySelector('.param-title').textContent.toLowerCase();
-    const match = terms.some(term => title.includes(term));
+    const match = terms.every(term => title.includes(term));
     block.style.display = match ? '' : 'none';
   });
 }
