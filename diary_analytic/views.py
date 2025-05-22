@@ -4,7 +4,7 @@ from datetime import datetime
 from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse, JsonResponse 
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST, require_GET
+from django.views.decorators.http import require_POST, require_GET, require_http_methods
 from .models import Entry, Parameter, EntryValue
 from .forms import EntryForm
 from .utils import get_diary_dataframe, get_today_row
@@ -393,3 +393,42 @@ def get_predictions_by_models(date):
         preds = manager.predict_for_date(date)
         predictions[model_name] = preds  # {'param1': 1.2, 'param2': 3.1, ...}
     return predictions
+
+# --------------------------------------------------------------------
+# 📝 API: Получение и сохранение описания параметра
+# --------------------------------------------------------------------
+@csrf_exempt
+@require_http_methods(["GET"])
+def get_parameter_description(request):
+    """
+    Получить описание параметра по ключу (?key=...)
+    """
+    key = request.GET.get("key")
+    if not key:
+        return JsonResponse({"error": "missing key"}, status=400)
+    try:
+        param = Parameter.objects.get(key=key)
+        return JsonResponse({"description": param.description or ""})
+    except Parameter.DoesNotExist:
+        return JsonResponse({"error": "not found"}, status=404)
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def set_parameter_description(request):
+    """
+    Сохранить описание параметра по ключу. В теле JSON: {"key":..., "description":...}
+    """
+    try:
+        data = json.loads(request.body)
+        key = data.get("key")
+        description = data.get("description", "")
+        if not key:
+            return JsonResponse({"error": "missing key"}, status=400)
+        param = Parameter.objects.get(key=key)
+        param.description = description
+        param.save()
+        return JsonResponse({"success": True})
+    except Parameter.DoesNotExist:
+        return JsonResponse({"error": "not found"}, status=404)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)

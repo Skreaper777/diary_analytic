@@ -34,6 +34,9 @@ class Parameter(models.Model):
     # Флаг активности — позволяет временно исключать параметр из UI и расчётов
     is_active = models.BooleanField(default=True)
 
+    # Многострочное описание параметра (опционально)
+    description = models.TextField(blank=True, default="")
+
     def __str__(self):
         # Отображение в админке: "Настроение"
         return self.name

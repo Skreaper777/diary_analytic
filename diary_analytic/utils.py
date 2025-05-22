@@ -102,6 +102,7 @@ def get_today_row(target_date: date) -> dict:
 def export_diary_to_csv(filepath=None):
     """
     Экспортирует все значения параметров в CSV-файл (широкий формат, как Короткая таблица3.csv).
+    Также создает отдельный лист/файл с описаниями параметров.
     :param filepath: путь к файлу (по умолчанию other/export.csv)
     """
     if filepath is None:
@@ -134,7 +135,28 @@ def export_diary_to_csv(filepath=None):
         # Ставим "Дата" первым столбцом, остальные — как в param_names
         columns = ["Дата"] + param_names
         df = df[columns]
-        df.to_csv(filepath, index=False, encoding="utf-8-sig")
+
+        # Экспорт основной таблицы
+        if filepath.endswith('.xlsx'):
+            with pd.ExcelWriter(filepath, engine='openpyxl') as writer:
+                df.to_excel(writer, index=False, encoding="utf-8-sig", sheet_name="Данные")
+                # Описания параметров на отдельном листе
+                desc_df = pd.DataFrame({
+                    "Ключ": [p.key for p in parameters],
+                    "Название": [p.name for p in parameters],
+                    "Описание": [p.description or "" for p in parameters],
+                })
+                desc_df.to_excel(writer, index=False, encoding="utf-8-sig", sheet_name="Описания параметров")
+        else:
+            # CSV: сохраняем основной файл и отдельный файл с описаниями
+            df.to_csv(filepath, index=False, encoding="utf-8-sig")
+            desc_path = filepath.replace('.csv', '_descriptions.csv')
+            desc_df = pd.DataFrame({
+                "Ключ": [p.key for p in parameters],
+                "Название": [p.name for p in parameters],
+                "Описание": [p.description or "" for p in parameters],
+            })
+            desc_df.to_csv(desc_path, index=False, encoding="utf-8-sig")
         db_logger.info(f"✅ Экспорт данных в CSV завершён: {filepath}, строк: {len(df)}")
     except Exception as e:
         db_logger.exception(f"❌ Ошибка при экспорте данных в CSV: {e}")

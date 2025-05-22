@@ -23,6 +23,9 @@ class ExcelImportForm(forms.Form):
 @admin.register(Parameter)
 class ParameterAdmin(admin.ModelAdmin):
     list_display = ("key", "name", "is_active")
+    search_fields = ("key", "name")
+    list_filter = ("is_active",)
+    fields = ("key", "name", "is_active", "description")
     # actions = None
 
     def get_urls(self):

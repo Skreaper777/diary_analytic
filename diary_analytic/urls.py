@@ -34,4 +34,8 @@ urlpatterns = [
 
     # API: история значений параметра
     path("api/parameter_history/", views.parameter_history, name="parameter_history"),
+
+    # API: описание параметра (GET/POST)
+    path("api/get_parameter_description/", views.get_parameter_description, name="get_parameter_description"),
+    path("api/set_parameter_description/", views.set_parameter_description, name="set_parameter_description"),
 ]

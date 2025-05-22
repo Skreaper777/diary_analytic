@@ -46,6 +46,7 @@
 
     <div id="charts-date-range-block" class="charts-date-range-block">
       <button type="button" class="charts-toggle-btn" id="focus-toggle-btn">Фокус</button>
+      <button type="button" class="charts-toggle-btn" id="comments-toggle-btn">Комментарии</button>
       <button type="button" class="charts-toggle-btn" id="predictions-toggle-btn">Прогноз</button>
       <button type="button" class="charts-toggle-btn" id="charts-toggle-btn" style="margin-left:0;">Графики</button>
       <label for="charts-min-date" style="color:#bbb;font-size:0.98em; margin-left: 8px;">С&nbsp;даты:</label>
@@ -89,6 +90,13 @@
           <canvas id="history-chart-{{ param.key }}" height="90"></canvas>
           <div class="history-chart-empty" id="history-chart-empty-{{ param.key }}" style="display:none;color:#888;text-align:center;font-size:0.95em;margin-top:4px;">Нет данных для графика</div>
         </div>
+        <!-- Блок описания параметра -->
+        <div class="param-description-block" data-param-key="{{ param.key }}" style="margin-top:12px;display:none;">
+          <label for="param-description-{{ param.key }}" style="font-size:0.98em;color:#888;">Описание параметра:</label>
+          <textarea id="param-description-{{ param.key }}" class="param-description-textarea" rows="3" style="width:100%;resize:vertical;min-height:60px;max-height:200px;">{{ param.description|default_if_none:'' }}</textarea>
+          <button class="save-description-btn" data-param-key="{{ param.key }}" style="display:none;margin-top:6px;">💾 Сохранить</button>
+          <div class="save-description-status" style="font-size:0.95em;color:#28a745;margin-top:4px;display:none;">Сохранено!</div>
+        </div>
       </div>
     {% endfor %}
 
@@ -117,5 +125,48 @@
   <script src="{% static 'js/diary.js' %}?v=1.0.1"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+  <script>
+    // JS для показа/скрытия комментариев и сохранения описаний
+    document.addEventListener('DOMContentLoaded', function() {
+      // Кнопка "Комментарии"
+      const commentsBtn = document.getElementById('comments-toggle-btn');
+      commentsBtn.addEventListener('click', function() {
+        document.querySelectorAll('.param-description-block').forEach(block => {
+          block.style.display = (block.style.display === 'none' || block.style.display === '') ? 'block' : 'none';
+        });
+      });
+      // Для каждого textarea отслеживаем изменения
+      document.querySelectorAll('.param-description-textarea').forEach(textarea => {
+        const paramKey = textarea.closest('.param-description-block').dataset.paramKey;
+        const saveBtn = textarea.parentElement.querySelector('.save-description-btn');
+        const statusDiv = textarea.parentElement.querySelector('.save-description-status');
+        let lastValue = textarea.value;
+        textarea.addEventListener('input', function() {
+          if (textarea.value !== lastValue) {
+            saveBtn.style.display = 'inline-block';
+            statusDiv.style.display = 'none';
+          } else {
+            saveBtn.style.display = 'none';
+          }
+        });
+        saveBtn.addEventListener('click', function() {
+          fetch('/api/set_parameter_description/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key: paramKey, description: textarea.value })
+          })
+          .then(resp => resp.json())
+          .then(data => {
+            if (data.success) {
+              lastValue = textarea.value;
+              saveBtn.style.display = 'none';
+              statusDiv.style.display = 'block';
+              setTimeout(() => { statusDiv.style.display = 'none'; }, 1500);
+            }
+          });
+        });
+      });
+    });
+  </script>
 </body>
 </html>
