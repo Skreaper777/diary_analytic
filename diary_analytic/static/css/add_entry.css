@@ -113,7 +113,7 @@ button[type="submit"]:hover {
   align-items: center;
   gap: 10px;
   margin-bottom: 10px;
-  max-width: 340px;
+  /*max-width: 340px;*/
   overflow-y: scroll;
 }
 
