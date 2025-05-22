@@ -74,6 +74,7 @@ button[type="submit"]:hover {
 .param-title-level-1 {
   padding: 0.3em 0 0 0.5em;
   color: #007bff;
+  font-size: 1.2em;
 }
 .param-title-level-2 {
   padding: 0.3em 0 0 0.9em;
