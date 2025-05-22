@@ -104,14 +104,16 @@
           </div>
         </div>
         <!-- конец модального окна -->
+        <div class="param-sum-block-range" id="param-sum-range-{{ param.key }}" style="">–</div>
         <div class="param-flex-row" style="display: flex; align-items: flex-start;">
           <div class="rating-buttons">
             {% for i in "012345"|make_list %}
               <button class="value-button{% if values_map|get:param.key|stringformat:'g' == i %} selected{% endif %}" data-value="{{ i }}">{{ i }}</button>
             {% endfor %}
+            <div class="param-sum-block" id="param-sum-{{ param.key }}"></div>
           </div>
-          <div class="param-sum-block-range" id="param-sum-range-{{ param.key }}" style="">–</div>
-          <div class="param-sum-block" id="param-sum-{{ param.key }}"></div>
+          
+          
           <div class="prediction-wrapper" style="margin-top: 0;">
             <div class="prediction-block">
               <div class="prediction-title">Прогноз</div>
@@ -120,10 +122,6 @@
             </div>
           </div>
         </div>
-        <div class="history-chart-block" style="display:none;">
-          <canvas id="history-chart-{{ param.key }}" height="90"></canvas>
-          <div class="history-chart-empty" id="history-chart-empty-{{ param.key }}" style="display:none;color:#888;text-align:center;font-size:0.95em;margin-top:4px;">Нет данных для графика</div>
-        </div>
         <!-- Блок описания параметра -->
         <div class="param-description-block" data-param-key="{{ param.key }}" style="margin:12px 32px 0 0;display:none;">
           <label for="param-description-{{ param.key }}" style="font-size:0.98em;color:#888;"></label>
@@ -131,6 +129,11 @@
           <button class="save-description-btn" data-param-key="{{ param.key }}" style="display:none;margin-top:6px;">💾 Сохранить</button>
           <div class="save-description-status" style="font-size:0.95em;color:#28a745;margin-top:4px;display:none;">Сохранено!</div>
         </div>
+        <div class="history-chart-block" style="display:none;">
+          <canvas id="history-chart-{{ param.key }}" height="90"></canvas>
+          <div class="history-chart-empty" id="history-chart-empty-{{ param.key }}" style="display:none;color:#888;text-align:center;font-size:0.95em;margin-top:4px;">Нет данных для графика</div>
+        </div>
+
       </div>
     {% endfor %}
 
