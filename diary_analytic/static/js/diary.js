@@ -786,8 +786,20 @@ async function updateParameterSums() {
         if (daysCount > 0) {
           const percent = Math.round((rangeSum / (4 * daysCount)) * 100);
           sumBlockRange.textContent = percent + '%';
+          // --- Новый код: смена цвета в зависимости от процента ---
+          let color = '';
+          if (percent <= 10) color = '#28a745';
+          else if (percent > 10 && percent <= 20) color = '#7fd428';
+          else if (percent > 20 && percent <= 40) color = '#e0a800';
+          else if (percent > 40 && percent <= 60) color = '#ff8800';
+          else if (percent > 60 && percent <= 80) color = '#ff3c00';
+          else if (percent > 80) color = '#dc3545';
+          sumBlockRange.style.background = color;
+          sumBlockRange.style.borderColor = color;
         } else {
           sumBlockRange.textContent = '–';
+          sumBlockRange.style.background = '';
+          sumBlockRange.style.borderColor = '';
         }
       }
     } catch {

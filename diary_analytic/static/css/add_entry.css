@@ -64,13 +64,15 @@ button[type="submit"]:hover {
   margin: 10px 0 20px 0;
   font-size: 1.5em;
   color: rgba(255, 255, 255, 0.754);
+  padding-bottom: 0.7em;
 }
 
 .param-title-level-0 {
-  font-weight: bold;
-  color: #222;
+  font-weight: 400;
+  color: #9b9b9b;
 }
 .param-title-level-1 {
+  padding: 0.3em 0 0 0.5em;
   color: #007bff;
 }
 .param-title-level-2 {
