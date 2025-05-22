@@ -1,7 +1,7 @@
 {% load static %}
 {% load diary_filters %}
 {% load diary_tags %}
-{% load static %}
+{% load param_title_split %}
 
 <!DOCTYPE html>
 <html lang="ru">
@@ -62,7 +62,11 @@
 
     {% for param in parameters %}
       <div class="parameter-block" data-key="{{ param.key }}" data-param="{{ param.key }}">
-        <div class="param-title">{{ param.name }}</div>
+        <div class="param-title">
+          {% for level, part in param.name|split_param_title %}
+            <div class="param-title-level-{{ level }}">{{ part }}</div>
+          {% endfor %}
+        </div>
         <div class="param-flex-row" style="display: flex; align-items: flex-start;">
           <div class="rating-buttons">
             {% for i in "012345"|make_list %}

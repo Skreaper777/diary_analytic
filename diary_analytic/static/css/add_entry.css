@@ -66,6 +66,21 @@ button[type="submit"]:hover {
   color: rgba(255, 255, 255, 0.754);
 }
 
+.param-title-level-0 {
+  font-weight: bold;
+  color: #222;
+}
+.param-title-level-1 {
+  color: #007bff;
+}
+.param-title-level-2 {
+  color: #28a745;
+}
+.param-title > div {
+  display: block;
+  margin-bottom: 2px;
+}
+
 .param-flex-row {
   display: flex;
   align-items: flex-start;
