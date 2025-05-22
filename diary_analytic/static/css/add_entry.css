@@ -114,7 +114,7 @@ button[type="submit"]:hover {
   gap: 10px;
   margin-bottom: 10px;
   max-width: 340px;
-  overflow: scroll;
+  overflow-y: scroll;
 }
 
 
@@ -231,7 +231,7 @@ button[type="submit"]:hover {
   margin-bottom: 18px;
   justify-content: space-between;
   align-items: center;
-  overflow: scroll;
+  overflow-y: scroll;
 }
 
 .sort-btns-left {
