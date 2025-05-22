@@ -117,6 +117,21 @@ button[type="submit"]:hover {
   overflow-y: scroll;
 }
 
+.param-sum-block-range {
+  min-width: 55px; 
+  height: 2.5rem; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  background:rgba(40, 167, 70, 0.66); 
+  color: #eee; 
+  border: 2px solid #28a745; 
+  border-radius: 6px; 
+  font-size: 1em; 
+  margin-right: 10px; 
+  padding: 0 10px; 
+  font-weight: bold;
+}
 
 .rating-buttons {
   display: flex;
