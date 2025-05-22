@@ -10,7 +10,7 @@ zhvt-obshch-gazy-all-p2,ЖВТ-ОБЩ 🫀 :: Газы 💨 :: {all} p2,
 zhvt-obshch-diskomfort-v-zhivote-all-p3,ЖВТ-ОБЩ 🫀 :: Дискомфорт в животе 🤕 :: {all} p3,
 zhvt-obshch-izzhoga-all-p3,ЖВТ-ОБЩ 🫀 :: Изжога 🔥 :: {all} p3,
 zhvt-obshch-kal-plokhoi-one-p2,ЖВТ-ОБЩ 🫀 :: Кал (плохой) 🟤 :: {one} p2,
-zhvt-pnk-golovokruzhenie-start-p1,ЖВТ-ПНК 🟤 :: Головокружение 🌀 :: {start} p1,
+zhvt-pnk-golovokruzhenie-start-p1,ЖВТ-ПНК 🟤 :: Головокружение 🌀 :: {start} p1,Стабильно уменьшается. Надо ждать. 👍
 zhvt-pnk-diareia-end-p3,ЖВТ-ПНК 🟤 :: Диарея 🚽 :: {end} p3,
 zhvt-pnk-zapor-one-p3,ЖВТ-ПНК 🟤 :: Запор 🚽 :: {one} p3,
 zhvt-pnk-pankreatit-i-moia-subektivnaia-otsenka-all-p2,ЖВТ-ПНК 🟤 :: Панкреатит и моя субъективная оценка 🩺💼 :: {all} p2,
@@ -60,11 +60,11 @@ pskh-nst-depressiia-dfl-def0-p4,ПСХ-НСТ 🧘‍♂️ :: Депресси�
 pskh-nst-udovolstvie-ot-dnia-end-p1-pos,ПСХ-НСТ 🧘‍♂️ :: Удовольствие от дня 👍🏻 :: {end} p1 pos,
 pskh-trv-suetlivost-all,ПСХ-ТРВ 🧘‍♂️ :: Суетливость 🤯 :: {all},
 pskh-trv-trevoga-all,ПСХ-ТРВ 🧘‍♂️ :: Тревога 👻 :: {all},
-pskh-enr-zhiznennaia-energiia-all-p1-pos,ПСХ-ЭНР 🧘‍♂️ :: Жизненная энергия 🔋 :: {all} p1 pos,
+pskh-enr-zhiznennaia-energiia-all-p1-pos,ПСХ-ЭНР 🧘‍♂️ :: Жизненная энергия 🔋 :: {all} p1 pos,"Не удивительно, что на фоне напряжения, стресса, тревоги жизненная энергия на низком уровне. "
 pskh-enr-lebido-end-pos,ПСХ-ЭНР 🧘‍♂️ :: Лебидо 💪🏻 :: {end} pos,
-pskh-enr-napriazhenie-all-p1,ПСХ-ЭНР 🧘‍♂️ :: Напряжение ⚡ :: {all} p1,
-pskh-enr-nastroenie-end-p1-pos,ПСХ-ЭНР 🧘‍♂️ :: Настроение 🌞 :: {end} p1 pos,
-pskh-enr-pozitiv-v-zhizni-all-p1-pos,ПСХ-ЭНР 🧘‍♂️ :: Позитив в жизни 🌞 :: {all} p1 pos,
+pskh-enr-napriazhenie-all-p1,ПСХ-ЭНР 🧘‍♂️ :: Напряжение ⚡ :: {all} p1,⚠️⛔️‼️А вот тут очень и очень опасно пока. Надо всеми силами снижать напряжение с себя. 
+pskh-enr-nastroenie-end-p1-pos,ПСХ-ЭНР 🧘‍♂️ :: Настроение 🌞 :: {end} p1 pos,"На удивление, в целом, настроение хорошее 😅"
+pskh-enr-pozitiv-v-zhizni-all-p1-pos,ПСХ-ЭНР 🧘‍♂️ :: Позитив в жизни 🌞 :: {all} p1 pos,Нужно находить всеми силами возможность находить в жизни что-то положительное. 
 pskh-enr-slabost-vialost-all,ПСХ-ЭНР 🧘‍♂️ :: Слабость вялость 😔 :: {all},
 rbt-obshch-giperfokus-povyshennaia-nagruzka-all-p3,РБТ-ОБЩ 💼 :: Гиперфокус (повышенная нагрузка) 🎯⚡ :: {all} p3,
 rbt-obshch-effektivnost-v-realnoi-rabote-all-p2-pos,РБТ-ОБЩ 💼 :: Эффективность в реальной работе 📈 :: {all} p2 pos,
