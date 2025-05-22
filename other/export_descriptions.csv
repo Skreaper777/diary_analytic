@@ -57,13 +57,13 @@ pskh-nrv-tiki-nervnye-all-p2,ПСХ-НРВ 🤬 :: Тики Нервные 😵�
 pskh-nst-apatiia-end,ПСХ-НСТ 🧘‍♂️ :: Апатия 😢 :: {end},
 pskh-nst-vypad-iz-kolei-end,ПСХ-НСТ 🧘‍♂️ :: Выпад из колеи 🛑 :: {end},
 pskh-nst-depressiia-dfl-def0-p4,ПСХ-НСТ 🧘‍♂️ :: Депрессия 🌧️ :: {dfl} def0 p4,
-pskh-nst-udovolstvie-ot-dnia-end-p1-pos,ПСХ-НСТ 🧘‍♂️ :: Удовольствие от дня 👍🏻 :: {end} p1 pos,
+pskh_nst_udovolstvie_ot_dnia_end_p0_pos,ПСХ-НСТ 🧘‍♂️ :: Удовольствие от дня 👍🏻 :: {end} p0 pos,
 pskh-trv-suetlivost-all,ПСХ-ТРВ 🧘‍♂️ :: Суетливость 🤯 :: {all},
 pskh-trv-trevoga-all,ПСХ-ТРВ 🧘‍♂️ :: Тревога 👻 :: {all},
-pskh-enr-zhiznennaia-energiia-all-p1-pos,ПСХ-ЭНР 🧘‍♂️ :: Жизненная энергия 🔋 :: {all} p1 pos,"Не удивительно, что на фоне напряжения, стресса, тревоги жизненная энергия на низком уровне. "
+pskh_enr_zhiznennaia_energiia_all_p0_pos,ПСХ-ЭНР 🧘‍♂️ :: Жизненная энергия 🔋 :: {all} p0 pos,"Не удивительно, что на фоне напряжения, стресса, тревоги жизненная энергия на низком уровне. "
 pskh-enr-lebido-end-pos,ПСХ-ЭНР 🧘‍♂️ :: Лебидо 💪🏻 :: {end} pos,
-pskh-enr-napriazhenie-all-p1,ПСХ-ЭНР 🧘‍♂️ :: Напряжение ⚡ :: {all} p1,⚠️⛔️‼️А вот тут очень и очень опасно пока. Надо всеми силами снижать напряжение с себя. 
-pskh-enr-nastroenie-end-p1-pos,ПСХ-ЭНР 🧘‍♂️ :: Настроение 🌞 :: {end} p1 pos,"На удивление, в целом, настроение хорошее 😅"
+pskh_enr_napriazhenie_all_p0,ПСХ-ЭНР 🧘‍♂️ :: Напряжение ⚡ :: {all} p0,⚠️⛔️‼️А вот тут очень и очень опасно пока. Надо всеми силами снижать напряжение с себя. 
+pskh_enr_nastroenie_end_p0_pos,ПСХ-ЭНР 🧘‍♂️ :: Настроение 🌞 :: {end} p0 pos,"На удивление, в целом, настроение хорошее 😅"
 pskh-enr-pozitiv-v-zhizni-all-p1-pos,ПСХ-ЭНР 🧘‍♂️ :: Позитив в жизни 🌞 :: {all} p1 pos,Нужно находить всеми силами возможность находить в жизни что-то положительное. 
 pskh-enr-slabost-vialost-all,ПСХ-ЭНР 🧘‍♂️ :: Слабость вялость 😔 :: {all},
 rbt-obshch-giperfokus-povyshennaia-nagruzka-all-p3,РБТ-ОБЩ 💼 :: Гиперфокус (повышенная нагрузка) 🎯⚡ :: {all} p3,

@@ -259,7 +259,7 @@ button[type="submit"]:hover {
   color: #eee;
   border: 1.5px solid #444;
   border-radius: 7px;
-  padding: 7px 18px;
+  padding: 7px 8px;
   font-size: 1em;
   cursor: pointer;
   transition: background 0.2s, color 0.2s, border 0.2s;

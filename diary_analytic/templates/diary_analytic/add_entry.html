@@ -46,9 +46,9 @@
 
     <div id="charts-date-range-block" class="charts-date-range-block">
       <button type="button" class="charts-toggle-btn" id="focus-toggle-btn">Фокус</button>
-      <button type="button" class="charts-toggle-btn" id="comments-toggle-btn">Комментарии</button>
-      <button type="button" class="charts-toggle-btn" id="predictions-toggle-btn">Прогноз</button>
-      <button type="button" class="charts-toggle-btn" id="charts-toggle-btn" style="margin-left:0;">Графики</button>
+      <button type="button" class="charts-toggle-btn" id="comments-toggle-btn">Ком</button>
+      <button type="button" class="charts-toggle-btn" id="predictions-toggle-btn">Прог</button>
+      <button type="button" class="charts-toggle-btn" id="charts-toggle-btn" style="margin-left:0;">Граф</button>
       <label for="charts-min-date" style="color:#bbb;font-size:0.98em; margin-left: 8px;">С&nbsp;даты:</label>
       <input type="date" id="charts-min-date" lang="ru-RU" style="min-width: 220px; background:#222;color:#eee;border:1.5px solid #444;border-radius:8px;padding:7px 12px;font-size:1em;outline:none;" />
     </div>
@@ -109,8 +109,8 @@
           <div class="history-chart-empty" id="history-chart-empty-{{ param.key }}" style="display:none;color:#888;text-align:center;font-size:0.95em;margin-top:4px;">Нет данных для графика</div>
         </div>
         <!-- Блок описания параметра -->
-        <div class="param-description-block" data-param-key="{{ param.key }}" style="margin-top:12px;display:none;">
-          <label for="param-description-{{ param.key }}" style="font-size:0.98em;color:#888;">Описание параметра:</label>
+        <div class="param-description-block" data-param-key="{{ param.key }}" style="margin:12px 32px 0 0;display:none;">
+          <label for="param-description-{{ param.key }}" style="font-size:0.98em;color:#888;"></label>
           <textarea id="param-description-{{ param.key }}" class="param-description-textarea" rows="3" style="width:100%;resize:vertical;min-height:60px;max-height:200px;">{{ param.description|default_if_none:'' }}</textarea>
           <button class="save-description-btn" data-param-key="{{ param.key }}" style="display:none;margin-top:6px;">💾 Сохранить</button>
           <div class="save-description-status" style="font-size:0.95em;color:#28a745;margin-top:4px;display:none;">Сохранено!</div>
@@ -149,8 +149,9 @@
       // Кнопка "Комментарии"
       const commentsBtn = document.getElementById('comments-toggle-btn');
       commentsBtn.addEventListener('click', function() {
+        const isActive = commentsBtn.classList.toggle('active');
         document.querySelectorAll('.param-description-block').forEach(block => {
-          block.style.display = (block.style.display === 'none' || block.style.display === '') ? 'block' : 'none';
+          block.style.display = isActive ? 'block' : 'none';
         });
       });
       // Для каждого textarea отслеживаем изменения
