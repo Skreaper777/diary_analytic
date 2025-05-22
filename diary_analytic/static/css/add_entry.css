@@ -108,6 +108,15 @@ button[type="submit"]:hover {
   opacity: 0.2;
 }
 
+.charts-date-range-block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  max-width: 340px;
+  overflow: scroll;
+}
+
 
 .rating-buttons {
   display: flex;
@@ -222,6 +231,7 @@ button[type="submit"]:hover {
   margin-bottom: 18px;
   justify-content: space-between;
   align-items: center;
+  overflow: scroll;
 }
 
 .sort-btns-left {
