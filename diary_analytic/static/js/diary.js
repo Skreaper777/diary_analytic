@@ -163,6 +163,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   setupChartsMinDateInput();
 
+  // --- Фокус ---
+  setupFocusToggleBtn();
+
   // --- Сортировка по сумме ---
   const sortBtnSum = document.querySelector('.sort-btn[data-sort="sum"]');
   const sortArrowSum = sortBtnSum ? sortBtnSum.querySelector('.sort-arrow') : null;
@@ -1112,3 +1115,34 @@ function loadSortState() {
   });
 
 })();
+
+// --- Фокус: скрытие кнопок для ввода параметров ---
+function setFocusMode(enabled) {
+  document.querySelectorAll('.parameter-block .rating-buttons').forEach(block => {
+    block.style.display = enabled ? 'none' : '';
+  });
+  const btn = document.getElementById('focus-toggle-btn');
+  if (btn) btn.classList.toggle('active', enabled);
+}
+
+function saveFocusModeState(enabled) {
+  localStorage.setItem('diary_focus_mode', enabled ? '1' : '0');
+}
+
+function loadFocusModeState() {
+  const val = localStorage.getItem('diary_focus_mode');
+  if (val === null) return false; // по умолчанию выключено
+  return val === '1';
+}
+
+function setupFocusToggleBtn() {
+  const btn = document.getElementById('focus-toggle-btn');
+  if (!btn) return;
+  btn.addEventListener('click', function() {
+    const nowEnabled = !loadFocusModeState();
+    setFocusMode(nowEnabled);
+    saveFocusModeState(nowEnabled);
+  });
+  // Восстановить состояние при загрузке
+  setFocusMode(loadFocusModeState());
+}
