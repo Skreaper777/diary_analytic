@@ -588,25 +588,33 @@ function filterParameterBlocks(filter) {
   }
   const terms = filter.toLowerCase().split(/\s+/).filter(Boolean);
   
-  // Разделяем термины на включаемые и исключаемые
-  const includedTerms = terms.filter(term => !term.startsWith('-'));
+  // Разделяем термины на включаемые (AND), исключаемые (NOT) и OR-термины
+  const includedTerms = terms.filter(term => !term.startsWith('-') && !term.startsWith('+'));
   const excludedTerms = terms
     .filter(term => term.startsWith('-'))
-    .map(term => term.slice(1)); // Убираем символ '-'
-  
+    .map(term => term.slice(1));
+  const orTerms = terms
+    .filter(term => term.startsWith('+'))
+    .map(term => term.slice(1));
+
   blocks.forEach(block => {
     const title = block.querySelector('.param-title').textContent.toLowerCase();
     
-    // Проверяем, что все включаемые термины присутствуют
+    // Проверяем, что все включаемые термины присутствуют (AND)
     const hasAllIncluded = includedTerms.length === 0 || 
       includedTerms.every(term => title.includes(term));
-    
-    // Проверяем, что ни один исключаемый термин не присутствует
+    // Проверяем, что ни один исключаемый термин не присутствует (NOT)
     const hasNoExcluded = excludedTerms.length === 0 || 
       !excludedTerms.some(term => title.includes(term));
+    // Проверяем, что хотя бы один OR-термин присутствует (OR)
+    const hasAnyOr = orTerms.length === 0 || 
+      orTerms.some(term => title.includes(term));
     
-    // Отображаем блок только если он удовлетворяет обоим условиям
-    block.style.display = (hasAllIncluded && hasNoExcluded) ? '' : 'none';
+    // Если есть хотя бы один OR-термин, то он становится обязательным условием
+    // (то есть: (AND) и (OR) и (NOT))
+    // Если OR-терминов нет, то только (AND) и (NOT)
+    const show = hasAllIncluded && hasNoExcluded && hasAnyOr;
+    block.style.display = show ? '' : 'none';
   });
 }
 
