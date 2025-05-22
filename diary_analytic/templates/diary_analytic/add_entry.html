@@ -32,6 +32,9 @@
     window.VALUES_MAP = VALUES_MAP;
   </script>
   <div class="container">
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+      <button id="theme-toggle-btn" type="button" style="background: #eee; color: #222; border: 1.5px solid #bbb; border-radius: 8px; padding: 7px 18px; font-size: 1em; cursor: pointer; margin-right: 0;">🌗 Тема</button>
+    </div>
     <h2>📘 Дневник состояния — {{ selected_date }}</h2>
     <div class="date-selector" style="margin-bottom: 28px; margin-top: 0; display: flex; justify-content: flex-end;">
       <input
@@ -244,6 +247,33 @@
       });
       // Инициализация
       updateParamBlocks();
+      // --- Переключение темы ---
+      const themeBtn = document.getElementById('theme-toggle-btn');
+      function setTheme(theme) {
+        if (theme === 'light') {
+          document.body.classList.add('light-theme');
+          localStorage.setItem('theme', 'light');
+          themeBtn.textContent = '🌞 Тема';
+        } else {
+          document.body.classList.remove('light-theme');
+          localStorage.setItem('theme', 'dark');
+          themeBtn.textContent = '🌗 Тема';
+        }
+      }
+      themeBtn.addEventListener('click', function() {
+        if (document.body.classList.contains('light-theme')) {
+          setTheme('dark');
+        } else {
+          setTheme('light');
+        }
+      });
+      // Инициализация темы при загрузке
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'light') {
+        setTheme('light');
+      } else {
+        setTheme('dark');
+      }
       // ... остальной JS ...
     });
   </script>

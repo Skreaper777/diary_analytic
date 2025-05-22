@@ -418,4 +418,109 @@ button[type="submit"]:hover {
     flex-wrap: wrap;
     /*gap: 8px !important;*/
   }
+}
+
+/* --- Светлая тема --- */
+.light-theme body {
+  background-color: #f6f7fa;
+  color: #222;
+}
+.light-theme .container {
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+.light-theme textarea {
+  background: #f3f4f7;
+  color: #222;
+  border: 1px solid #d0d4db;
+}
+.light-theme .parameter-block {
+  background-color: #f3f4f7;
+  border: 1px solid #d0d4db;
+}
+.light-theme .param-title {
+  color: #222;
+}
+.light-theme .param-title-level-0 {
+  color: #b0b0b0;
+}
+.light-theme .param-title-level-1 {
+  color: #007bff;
+}
+.light-theme .param-title-level-2 {
+  color: #e0e0e0;
+}
+.light-theme .param-sum-block {
+  color: #222;
+  background: rgba(0, 123, 255, 0.10);
+  border: 2px solid #007bff;
+}
+.light-theme .param-sum-block-range {
+  color: #222;
+  background: rgba(40, 167, 70, 0.13);
+  border: 2px solid #28a745;
+}
+.light-theme .value-button {
+  background: #f3f4f7;
+  color: #222;
+  border: 2px solid #d0d4db;
+}
+.light-theme .value-button.selected[data-value="2"],
+.light-theme .value-button.selected[data-value="3"] {
+  color: #fff;
+}
+.light-theme .prediction-block {
+  background: #f3f4f7;
+  border: 1px solid #d0d4db;
+}
+.light-theme .prediction-title {
+  color: #888;
+}
+.light-theme .predicted {
+  color: #555;
+}
+.light-theme .predicted-secondary {
+  color: #aaa;
+}
+.light-theme .sort-btn {
+  background: #f3f4f7;
+  color: #222;
+  border: 1.5px solid #d0d4db;
+}
+.light-theme .sort-btn:hover, .light-theme .sort-btn.active {
+  background: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+.light-theme #date-input[type="date"] {
+  background: #f3f4f7;
+  color: #222;
+  border: 1.5px solid #d0d4db;
+}
+.light-theme #date-input[type="date"]:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px #007bff33;
+}
+.light-theme .history-chart-block {
+  background: #f9f9fb;
+  border: 1px solid #e0e0e0;
+}
+.light-theme .charts-toggle-btn {
+  background: #f3f4f7;
+  color: #222;
+  border: 1.5px solid #d0d4db;
+}
+.light-theme .charts-toggle-btn.active {
+  background: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+.light-theme #param-filter-input {
+  background: #f3f4f7;
+  color: #222;
+  border: 1.5px solid #d0d4db;
+}
+.light-theme #param-filter-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px #007bff33;
 } 
