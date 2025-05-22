@@ -16,6 +16,8 @@ import traceback
 from django.conf import settings
 from diary_analytic.ml_utils import get_model
 import pandas as pd
+import re
+from slugify import slugify
 
 
 # --------------------------------------------------------------------
@@ -428,6 +430,37 @@ def set_parameter_description(request):
         param.description = description
         param.save()
         return JsonResponse({"success": True})
+    except Parameter.DoesNotExist:
+        return JsonResponse({"error": "not found"}, status=404)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
+
+@csrf_exempt
+@require_POST
+def rename_parameter(request):
+    """
+    Переименовывает параметр (имя и ключ) и обновляет все связанные объекты.
+    Ожидает JSON: {"old_key": ..., "new_name": ...}
+    Новый ключ формируется автоматически из нового имени через slugify.
+    Возвращает: {"success": true, "new_key": ...}
+    """
+    try:
+        from slugify import slugify
+        data = json.loads(request.body)
+        old_key = data.get("old_key")
+        new_name = data.get("new_name")
+        if not old_key or not new_name:
+            return JsonResponse({"error": "missing fields"}, status=400)
+        new_key = slugify(new_name, separator="_")
+        if not new_key:
+            return JsonResponse({"error": "Не удалось сгенерировать ключ"}, status=400)
+        if Parameter.objects.filter(key=new_key).exclude(key=old_key).exists():
+            return JsonResponse({"error": f"Ключ уже существует: {new_key}"}, status=400)
+        param = Parameter.objects.get(key=old_key)
+        param.name = new_name
+        param.key = new_key
+        param.save()
+        return JsonResponse({"success": True, "new_key": new_key})
     except Parameter.DoesNotExist:
         return JsonResponse({"error": "not found"}, status=404)
     except Exception as e:

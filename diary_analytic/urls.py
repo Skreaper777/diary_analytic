@@ -38,4 +38,7 @@ urlpatterns = [
     # API: описание параметра (GET/POST)
     path("api/get_parameter_description/", views.get_parameter_description, name="get_parameter_description"),
     path("api/set_parameter_description/", views.set_parameter_description, name="set_parameter_description"),
+
+    # API: переименование параметра
+    path("api/rename_parameter/", views.rename_parameter, name="rename_parameter"),
 ]

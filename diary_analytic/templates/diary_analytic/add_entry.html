@@ -64,12 +64,30 @@
     </div>
 
     {% for param in parameters %}
-      <div class="parameter-block" data-key="{{ param.key }}" data-param="{{ param.key }}">
-        <div class="param-title">
+      <div class="parameter-block" data-key="{{ param.key }}" data-param="{{ param.key }}" style="position:relative;">
+        <div class="param-title" style="position:relative;">
           {% for level, part in param.name|split_param_title %}
             <div class="param-title-level-{{ level }}">{{ part }}</div>
           {% endfor %}
+          <!-- Карандаш -->
+          <button class="edit-param-btn" title="Переименовать" style="position:absolute;top:0;right:0;background:none;border:none;cursor:pointer;padding:2px 4px;z-index:2;">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M14.7 2.29a1 1 0 0 1 1.42 0l1.59 1.59a1 1 0 0 1 0 1.42l-9.3 9.3-2.12.71.71-2.12 9.3-9.3zM3 17h14v2H3v-2z" fill="#888"/></svg>
+          </button>
         </div>
+        <!-- Модальное окно для переименования -->
+        <div class="rename-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(30,32,38,0.55);z-index:1000;align-items:center;justify-content:center;">
+          <div style="background:#23272f;padding:28px 24px 20px 24px;border-radius:14px;min-width:320px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,0.22);position:relative;color:#eee;font-family:inherit;">
+            <h3 style="margin-top:0;margin-bottom:18px;font-size:1.15em;color:#fff;">Переименовать параметр</h3>
+            <label style="font-size:0.98em;color:#bbb;">Новое название:</label>
+            <input type="text" class="rename-param-name" style="width:100%;margin-bottom:18px;padding:9px 12px;font-size:1em;border-radius:8px;border:1.5px solid #444;background:#181a20;color:#eee;outline:none;" value="{{ param.name }}" />
+            <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px;">
+              <button class="cancel-rename-btn" style="background:#007bff;color:white;padding:8px 22px;border:none;border-radius:8px;font-size:1em;box-shadow:0 2px 8px rgba(0,123,255,0.08);transition:background 0.2s;">Отменить</button>
+              <button class="save-rename-btn" style="background:#28a745;color:white;padding:8px 22px;border:none;border-radius:8px;font-size:1em;box-shadow:0 2px 8px rgba(40,167,69,0.08);transition:background 0.2s;">Сохранить</button>
+            </div>
+            <div class="rename-error" style="color:#ff6b6b;font-size:0.98em;margin-top:14px;display:none;"></div>
+          </div>
+        </div>
+        <!-- конец модального окна -->
         <div class="param-flex-row" style="display: flex; align-items: flex-start;">
           <div class="rating-buttons">
             {% for i in "012345"|make_list %}
@@ -164,6 +182,57 @@
               setTimeout(() => { statusDiv.style.display = 'none'; }, 1500);
             }
           });
+        });
+      });
+      // --- Логика для переименования параметра ---
+      document.querySelectorAll('.parameter-block').forEach(block => {
+        const editBtn = block.querySelector('.edit-param-btn');
+        const modal = block.querySelector('.rename-modal');
+        const nameInput = block.querySelector('.rename-param-name');
+        const saveBtn = block.querySelector('.save-rename-btn');
+        const cancelBtn = block.querySelector('.cancel-rename-btn');
+        const errorDiv = block.querySelector('.rename-error');
+        if (!editBtn || !modal) return;
+        editBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          modal.style.display = 'flex';
+          nameInput.value = block.querySelector('.rename-param-name').defaultValue;
+          errorDiv.style.display = 'none';
+        });
+        cancelBtn.addEventListener('click', function() {
+          modal.style.display = 'none';
+        });
+        modal.addEventListener('click', function(e) {
+          if (e.target === modal) modal.style.display = 'none';
+        });
+        saveBtn.addEventListener('click', async function() {
+          const oldKey = block.getAttribute('data-key');
+          const newName = nameInput.value.trim();
+          if (!newName) {
+            errorDiv.textContent = 'Заполните новое название';
+            errorDiv.style.display = 'block';
+            return;
+          }
+          saveBtn.disabled = true;
+          errorDiv.style.display = 'none';
+          try {
+            const resp = await fetch('/api/rename_parameter/', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ old_key: oldKey, new_name: newName })
+            });
+            const data = await resp.json();
+            if (data.success) {
+              window.location.reload();
+            } else {
+              errorDiv.textContent = data.error || 'Ошибка';
+              errorDiv.style.display = 'block';
+            }
+          } catch (e) {
+            errorDiv.textContent = 'Ошибка соединения';
+            errorDiv.style.display = 'block';
+          }
+          saveBtn.disabled = false;
         });
       });
     });
