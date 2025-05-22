@@ -289,6 +289,64 @@ document.addEventListener("DOMContentLoaded", async function () {
   // --- Глобальные переменные для сортировки по прогнозу ---
   window.sortBtnPred = document.querySelector('.sort-btn[data-sort="prediction"]');
   window.sortArrowPred = sortBtnPred ? sortBtnPred.querySelector('.sort-arrow') : null;
+
+  // --- Кнопка def ---
+  const defBtn = document.getElementById('def-btn');
+  if (defBtn) {
+    defBtn.addEventListener('click', async function() {
+      defBtn.disabled = true;
+      defBtn.textContent = '⏳ def...';
+      try {
+        let count = 0;
+        for (const block of document.querySelectorAll('.parameter-block')) {
+          const paramKey = block.getAttribute('data-key');
+          const paramTitle = block.querySelector('.param-title').textContent;
+          // Ищем "def" и число после него
+          const match = paramTitle.match(/def\s*(\d+)/i);
+          if (match) {
+            const defValue = parseInt(match[1], 10);
+            // Проверяем, есть ли уже значение
+            const selectedBtn = block.querySelector('.value-button.selected');
+            if (!selectedBtn) {
+              // Отправляем на сервер
+              const payload = {
+                parameter: paramKey,
+                value: defValue,
+                date: dateValue,
+              };
+              try {
+                const response = await fetch('/update_value/', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                  },
+                  body: JSON.stringify(payload),
+                });
+                if (response.ok) {
+                  // Подсвечиваем кнопку
+                  const btn = block.querySelector(`.value-button[data-value="${defValue}"]`);
+                  if (btn) btn.classList.add('selected');
+                  count++;
+                }
+              } catch (e) {
+                console.error('Ошибка при установке дефолтного значения:', e);
+              }
+            }
+          }
+        }
+        if (count > 0) {
+          loadPredictions();
+          alert(`Установлено дефолтных значений: ${count}`);
+        } else {
+          alert('Нет параметров с def или все уже заполнены.');
+        }
+      } finally {
+        defBtn.disabled = false;
+        defBtn.textContent = 'def';
+      }
+    });
+  }
 });
 
 // 🔐 Получение CSRF-токена из cookie
