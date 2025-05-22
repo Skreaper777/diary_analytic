@@ -95,7 +95,7 @@ button[type="submit"]:hover {
   display: flex;
   gap: 10px;
   flex-wrap: nowrap;
-  margin-bottom: 8px;
+  margin-bottom: 20px;
   margin-right: 30px;
 }
 
