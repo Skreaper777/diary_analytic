@@ -912,14 +912,14 @@ async function updateParameterSums() {
             if (percent <= 10) color = '#dc3545';
             else if (percent <= 20) color = '#ff3c00';
             else if (percent <= 40) color = '#ff8800';
-            else if (percent <= 60) color = '#e0a800';
+            else if (percent <= 65) color = '#e0a800';
             else if (percent <= 80) color = '#28a745';
             else color = '#7fd428';
           } else {
             if (percent <= 10) color = '#7fd428';
             else if (percent <= 20) color = '#28a745';
             else if (percent <= 40) color = '#e0a800';
-            else if (percent <= 60) color = '#ff8800';
+            else if (percent <= 65) color = '#ff8800';
             else if (percent <= 80) color = '#ff3c00';
             else color = '#dc3545';
           }
