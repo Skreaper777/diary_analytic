@@ -366,7 +366,7 @@ button[type="submit"]:hover {
 }
 #param-filter-input {
   width: 100%;
-  max-width: 340px;
+  /*max-width: 340px;*/
   background: #222;
   color: #eee;
   border: 1.5px solid #444;
