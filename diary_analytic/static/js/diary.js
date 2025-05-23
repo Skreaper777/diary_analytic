@@ -846,8 +846,6 @@ async function fillChartsMinDateInput(selectedDate) {
       return;
     }
     input.disabled = false;
-    input.min = data.dates[0];
-    input.max = data.dates[data.dates.length - 1];
     // Восстанавливаем выбранное значение из localStorage или из selectedDate
     const savedMinDate = loadChartsMinDate();
     if (savedMinDate && data.dates.includes(savedMinDate)) {
