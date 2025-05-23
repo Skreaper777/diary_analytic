@@ -168,6 +168,58 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // --- Сортировка по сумме ---
   const sortBtnSum = document.querySelector('.sort-btn[data-sort="sum"]');
+
+// --- Сортировка по процентам ---
+const sortBtnPercent = document.querySelector('.sort-btn[data-sort="sum-percent"]');
+const sortArrowPercent = sortBtnPercent ? sortBtnPercent.querySelector('.sort-arrow') : null;
+let sortStatePercent = 0;
+
+function getPercentValue(block) {
+  const percentBlock = block.querySelector('.param-sum-block-range');
+  if (!percentBlock) return -1;
+  const val = percentBlock.textContent.trim().replace('%', '');
+  const num = parseFloat(val.replace(',', '.'));
+  return isNaN(num) ? -1 : num;
+}
+
+function sortByPercent(direction) {
+  const blocks = Array.from(document.querySelectorAll('.parameter-block'));
+  blocks.sort((a, b) => {
+    const aVal = getPercentValue(a);
+    const bVal = getPercentValue(b);
+    return direction === 1 ? bVal - aVal : aVal - bVal;
+  });
+
+  const container = document.querySelector('.parameters-list');
+  blocks.forEach((block) => container.appendChild(block));
+}
+
+if (sortBtnPercent) {
+  sortBtnPercent.addEventListener('click', () => {
+    sortStatePercent = (sortStatePercent + 1) % 3;
+    if (sortArrowPercent) {
+      sortArrowPercent.innerHTML = sortStatePercent === 1 ? '↓' : sortStatePercent === 2 ? '↑' : '';
+    }
+
+    if (sortStatePercent === 0) return;
+
+    const maxWaitMs = 7000;
+    const checkIntervalMs = 300;
+    let waited = 0;
+
+    const interval = setInterval(() => {
+      const ready = Array.from(document.querySelectorAll('.param-sum-block-range'))
+        .every(el => el.textContent.trim().endsWith('%'));
+
+      if (ready || waited >= maxWaitMs) {
+        clearInterval(interval);
+        sortByPercent(sortStatePercent === 1 ? 1 : -1);
+      }
+
+      waited += checkIntervalMs;
+    }, checkIntervalMs);
+  });
+}
   const sortArrowSum = sortBtnSum ? sortBtnSum.querySelector('.sort-arrow') : null;
   let sortStateSum = 0;
 
