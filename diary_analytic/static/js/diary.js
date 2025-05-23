@@ -481,10 +481,15 @@ async function loadParameterHistory(paramKey, dateStr) {
     const minDate = loadChartsMinDate();
     let filteredDates = data.dates;
     let filteredValues = data.values;
-    if (minDate && data.dates.includes(minDate)) {
-      const idx = data.dates.indexOf(minDate);
-      filteredDates = data.dates.slice(idx);
-      filteredValues = data.values.slice(idx);
+    if (minDate) {
+      const idx = data.dates.findIndex(date => date >= minDate);
+      if (idx !== -1) {
+        filteredDates = data.dates.slice(idx);
+        filteredValues = data.values.slice(idx);
+      } else {
+        filteredDates = [];
+        filteredValues = [];
+      }
     }
     const monthsRu = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
     const labels = filteredDates.map(d => {
@@ -811,11 +816,13 @@ async function updateParameterSums() {
   const dateInput = document.getElementById('date-input');
   const minDate = minDateInput ? minDateInput.value : '';
   const toDate = dateInput ? dateInput.value : '';
+
   document.querySelectorAll('.parameter-block').forEach(async (block) => {
     const paramKey = block.getAttribute('data-key');
     const sumBlock = block.querySelector('.param-sum-block');
     const sumBlockRange = block.querySelector('.param-sum-block-range');
     if (!sumBlock) return;
+
     try {
       const res = await fetch(`/api/parameter_history/?param=${encodeURIComponent(paramKey)}&date=${encodeURIComponent(toDate)}`);
       const data = await res.json();
@@ -824,50 +831,49 @@ async function updateParameterSums() {
         if (sumBlockRange) sumBlockRange.textContent = '';
         return;
       }
-      let filteredValues = data.values;
-      if (minDate && data.dates.includes(minDate)) {
-        const idx = data.dates.indexOf(minDate);
-        filteredValues = data.values.slice(idx);
+
+      // --- НАЧАЛО: фильтрация по диапазону [minDate - toDate]
+      let rangeStartIdx = 0;
+      if (minDate) {
+        rangeStartIdx = data.dates.findIndex(date => date >= minDate);
+        if (rangeStartIdx === -1) rangeStartIdx = data.dates.length; // ничего не попадёт
       }
+
+      const rangeValues = data.values.slice(rangeStartIdx);
+      const rangeDates = data.dates.slice(rangeStartIdx);
+      // --- КОНЕЦ: фильтрация диапазона
+
       // Суммируем значения (игнорируем null/NaN)
-      const sum = filteredValues.reduce((acc, v) => acc + (typeof v === 'number' && !isNaN(v) ? v : 0), 0);
+      const sum = rangeValues.reduce((acc, v) => acc + (typeof v === 'number' && !isNaN(v) ? v : 0), 0);
       sumBlock.textContent = sum ? Math.round(sum) : '0';
+
       // --- Новый блок: сумма по диапазону дат ---
       if (sumBlockRange) {
-        // Всегда считаем сумму по диапазону minDate - toDate
-        let rangeValues = data.values;
-        let rangeDates = data.dates;
-        if (minDate && data.dates.includes(minDate)) {
-          const idx = data.dates.indexOf(minDate);
-          rangeValues = data.values.slice(idx);
-          rangeDates = data.dates.slice(idx);
-        }
         const rangeSum = rangeValues.reduce((acc, v) => acc + (typeof v === 'number' && !isNaN(v) ? v : 0), 0);
         const daysCount = rangeDates.length;
         if (daysCount > 0) {
           const percent = Math.round((rangeSum / (4 * daysCount)) * 100);
           sumBlockRange.textContent = percent + '%';
-          // --- Новый код: смена цвета в зависимости от процента и наличия 'pos' в названии ---
-          let color = '';
-          // Получаем название параметра
+
+          // --- Цвет по шкале
           const paramTitle = block.querySelector('.param-title')?.textContent || '';
+          let color = '';
           if (/pos/i.test(paramTitle)) {
-            // Обратная шкала для "pos"
             if (percent <= 10) color = '#dc3545';
-            else if (percent > 10 && percent <= 20) color = '#ff3c00';
-            else if (percent > 20 && percent <= 40) color = '#ff8800';
-            else if (percent > 40 && percent <= 60) color = '#e0a800';
-            else if (percent > 60 && percent <= 80) color = '#28a745';
-            else if (percent > 80) color = '#7fd428';
+            else if (percent <= 20) color = '#ff3c00';
+            else if (percent <= 40) color = '#ff8800';
+            else if (percent <= 60) color = '#e0a800';
+            else if (percent <= 80) color = '#28a745';
+            else color = '#7fd428';
           } else {
-            // Обычная шкала
             if (percent <= 10) color = '#7fd428';
-            else if (percent > 10 && percent <= 20) color = '#28a745';
-            else if (percent > 20 && percent <= 40) color = '#e0a800';
-            else if (percent > 40 && percent <= 60) color = '#ff8800';
-            else if (percent > 60 && percent <= 80) color = '#ff3c00';
-            else if (percent > 80) color = '#dc3545';
+            else if (percent <= 20) color = '#28a745';
+            else if (percent <= 40) color = '#e0a800';
+            else if (percent <= 60) color = '#ff8800';
+            else if (percent <= 80) color = '#ff3c00';
+            else color = '#dc3545';
           }
+
           sumBlockRange.style.background = color;
           sumBlockRange.style.borderColor = color;
         } else {
@@ -882,6 +888,7 @@ async function updateParameterSums() {
     }
   });
 }
+
 
 // --- Обновлять сумму при изменении дат и при загрузке страницы ---
 document.addEventListener('DOMContentLoaded', function() {
