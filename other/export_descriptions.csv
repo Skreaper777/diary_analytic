@@ -17,7 +17,7 @@ zhvt-pnk-fermenty-one-p3-pos,ЖВТ-ПНК 🟤 :: Ферменты 💊 :: {one
 zdr-zariadka-dfl-def0-p4-pos,ЗДР 💪 :: Зарядка 🏋️ :: {dfl} def0 p4 pos,
 zdr-obektivno-ia-zabolel-one-p3,ЗДР 💪 :: Объективно я заболел 🩺 :: {one} p3,
 zdr-progulka-end-pos,ЗДР 💪 :: Прогулка 🚶 :: {end} pos,
-nrv-mshn-agressiia-za-rulem-one,НРВ-МШН 🚗 :: Агрессия за рулем 🤬 :: {one},
+nrv_mshn_agressiia_za_rulem_one,НРВ-МШН 🚗 :: Агрессия за рулем 🤬 :: {one},Проверка
 nrv-mshn-nervoznost-i-stress-za-rulem-one,НРВ-МШН 🚗 :: Нервозность и стресс за рулем 😠 :: {one},
 nrv-mshn-razdrazhaet-nerviruet-ezda-za-rulem-one,НРВ-МШН 🚗 :: Раздражает (нервирует) езда за рулем 😠 :: {one},
 obshch-ustalost-k-seredine-dnia-one,ОБЩ 👤 :: Усталость к середине дня 😪 :: {one},

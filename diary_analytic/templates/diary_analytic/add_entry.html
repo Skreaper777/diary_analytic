@@ -146,8 +146,10 @@
   <script src="{% static 'js/diary.js' %}?v=230523-1"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+  <script src="{% static 'js/rename_param.js' %}?v=1.0.0"></script>
+  <script src="{% static 'js/param_comment.js' %}?v=1.0.0"></script>
   <script>
-    // JS для показа/скрытия комментариев и сохранения описаний
+    // JS для показа/скрытия комментариев
     document.addEventListener('DOMContentLoaded', function() {
       // Кнопка "Комментарии"
       const commentsBtn = document.getElementById('comments-toggle-btn');
@@ -155,88 +157,6 @@
         const isActive = commentsBtn.classList.toggle('active');
         document.querySelectorAll('.param-description-block').forEach(block => {
           block.style.display = isActive ? 'block' : 'none';
-        });
-      });
-      // Для каждого textarea отслеживаем изменения
-      document.querySelectorAll('.param-description-textarea').forEach(textarea => {
-        const paramKey = textarea.closest('.param-description-block').dataset.paramKey;
-        const saveBtn = textarea.parentElement.querySelector('.save-description-btn');
-        const statusDiv = textarea.parentElement.querySelector('.save-description-status');
-        let lastValue = textarea.value;
-        textarea.addEventListener('input', function() {
-          if (textarea.value !== lastValue) {
-            saveBtn.style.display = 'inline-block';
-            statusDiv.style.display = 'none';
-          } else {
-            saveBtn.style.display = 'none';
-          }
-        });
-        saveBtn.addEventListener('click', function() {
-          fetch('/api/set_parameter_description/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ key: paramKey, description: textarea.value })
-          })
-          .then(resp => resp.json())
-          .then(data => {
-            if (data.success) {
-              lastValue = textarea.value;
-              saveBtn.style.display = 'none';
-              statusDiv.style.display = 'block';
-              setTimeout(() => { statusDiv.style.display = 'none'; }, 1500);
-            }
-          });
-        });
-      });
-      // --- Логика для переименования параметра ---
-      document.querySelectorAll('.parameter-block').forEach(block => {
-        const editBtn = block.querySelector('.edit-param-btn');
-        const modal = block.querySelector('.rename-modal');
-        const nameInput = block.querySelector('.rename-param-name');
-        const saveBtn = block.querySelector('.save-rename-btn');
-        const cancelBtn = block.querySelector('.cancel-rename-btn');
-        const errorDiv = block.querySelector('.rename-error');
-        if (!editBtn || !modal) return;
-        editBtn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          modal.style.display = 'flex';
-          nameInput.value = block.querySelector('.rename-param-name').defaultValue;
-          errorDiv.style.display = 'none';
-        });
-        cancelBtn.addEventListener('click', function() {
-          modal.style.display = 'none';
-        });
-        modal.addEventListener('click', function(e) {
-          if (e.target === modal) modal.style.display = 'none';
-        });
-        saveBtn.addEventListener('click', async function() {
-          const oldKey = block.getAttribute('data-key');
-          const newName = nameInput.value.trim();
-          if (!newName) {
-            errorDiv.textContent = 'Заполните новое название';
-            errorDiv.style.display = 'block';
-            return;
-          }
-          saveBtn.disabled = true;
-          errorDiv.style.display = 'none';
-          try {
-            const resp = await fetch('/api/rename_parameter/', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ old_key: oldKey, new_name: newName })
-            });
-            const data = await resp.json();
-            if (data.success) {
-              window.location.reload();
-            } else {
-              errorDiv.textContent = data.error || 'Ошибка';
-              errorDiv.style.display = 'block';
-            }
-          } catch (e) {
-            errorDiv.textContent = 'Ошибка соединения';
-            errorDiv.style.display = 'block';
-          }
-          saveBtn.disabled = false;
         });
       });
     });
