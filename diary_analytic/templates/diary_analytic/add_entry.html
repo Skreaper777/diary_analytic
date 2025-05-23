@@ -10,18 +10,6 @@
   <title>Форма дневника состояния</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="{% static 'css/add_entry.css' %}?v=1.0.6">
-  <style>
-    /* Стили для ZEN */
-    #zen-toggle-btn {
-      background: #222 !important;
-      color: #ffb300 !important;
-      transition: background 0.2s, color 0.2s;
-    }
-    #zen-toggle-btn.active {
-      background: #ffb300 !important;
-      color: #fff !important;
-    }
-  </style>
 </head>
 <body>
   <script id="values-map" type="application/json">
@@ -32,9 +20,6 @@
     window.VALUES_MAP = VALUES_MAP;
   </script>
   <div class="container">
-    <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
-      <button id="theme-toggle-btn" type="button" style="background: #eee; color: #222; border: 1.5px solid #bbb; border-radius: 8px; padding: 7px 18px; font-size: 1em; cursor: pointer; margin-right: 0;">🌗 Тема</button>
-    </div>
     <h2>📘 Дневник состояния — {{ selected_date }}</h2>
     <div class="date-selector" style="margin-bottom: 28px; margin-top: 0; display: flex; justify-content: flex-end;">
       <input
@@ -60,11 +45,10 @@
     </div>
 
     <div id="charts-date-range-block" class="charts-date-range-block">
-      <button type="button" class="charts-toggle-btn" id="zen-toggle-btn" style="margin-right:8px;background:#222;color:#ffb300;">ZEN</button>
-      <button type="button" class="charts-toggle-btn active" id="focus-toggle-btn">Фокус</button>
-      <button type="button" class="charts-toggle-btn active" id="comments-toggle-btn">Ком</button>
+      <button type="button" class="charts-toggle-btn" id="focus-toggle-btn">Фокус</button>
+      <button type="button" class="charts-toggle-btn" id="comments-toggle-btn">Ком</button>
       <button type="button" class="charts-toggle-btn" id="predictions-toggle-btn">Прог</button>
-      <button type="button" class="charts-toggle-btn active" id="charts-toggle-btn" style="margin-left:0;">Граф</button>
+      <button type="button" class="charts-toggle-btn" id="charts-toggle-btn" style="margin-left:0;">Граф</button>
       <label for="charts-min-date" style="color:#bbb;font-size:0.98em; margin-left: 8px;">С&nbsp;даты:</label>
       <input type="date" id="charts-min-date" lang="ru-RU" style="min-width: 220px; background:#222;color:#eee;border:1.5px solid #444;border-radius:8px;padding:7px 12px;font-size:1em;outline:none;" />
     </div>
@@ -163,121 +147,98 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
   <script>
+    // JS для показа/скрытия комментариев и сохранения описаний
     document.addEventListener('DOMContentLoaded', function() {
-      const zenBtn = document.getElementById('zen-toggle-btn');
-      const focusBtn = document.getElementById('focus-toggle-btn');
+      // Кнопка "Комментарии"
       const commentsBtn = document.getElementById('comments-toggle-btn');
-      const predictionsBtn = document.getElementById('predictions-toggle-btn');
-      const chartsBtn = document.getElementById('charts-toggle-btn');
-      // Состояния по умолчанию
-      focusBtn.classList.add('active');
-      commentsBtn.classList.add('active');
-      chartsBtn.classList.add('active');
-      predictionsBtn.classList.remove('active');
-      zenBtn.classList.remove('active');
-      // --- ZEN ---
-      let zenPrevState = null;
-      zenBtn.addEventListener('click', function() {
-        const zenActive = zenBtn.classList.toggle('active');
-        if (zenActive) {
-          // Запоминаем состояние
-          zenPrevState = {
-            focus: focusBtn.classList.contains('active'),
-            comments: commentsBtn.classList.contains('active'),
-            predictions: predictionsBtn.classList.contains('active'),
-            charts: chartsBtn.classList.contains('active'),
-          };
-          [focusBtn, commentsBtn, predictionsBtn, chartsBtn].forEach(btn => btn.classList.remove('active'));
-          updateParamBlocks();
-        } else {
-          // Восстанавливаем состояние
-          if (zenPrevState) {
-            if (zenPrevState.focus) focusBtn.classList.add('active');
-            if (zenPrevState.comments) commentsBtn.classList.add('active');
-            if (zenPrevState.predictions) predictionsBtn.classList.add('active');
-            if (zenPrevState.charts) chartsBtn.classList.add('active');
-          }
-          updateParamBlocks();
-        }
-      });
-      // --- Управление отображением блоков ---
-      function updateParamBlocks() {
-        // Фокус: rating-buttons
-        document.querySelectorAll('.parameter-block').forEach(block => {
-          const rating = block.querySelector('.rating-buttons');
-          if (focusBtn.classList.contains('active')) {
-            rating && (rating.style.display = '');
-          } else {
-            rating && (rating.style.display = 'none');
-          }
-        });
-        // Комментарии: param-description-block
-        document.querySelectorAll('.param-description-block').forEach(block => {
-          block.style.display = commentsBtn.classList.contains('active') ? 'block' : 'none';
-        });
-        // Прогнозы: prediction-wrapper (исправлено)
-        document.querySelectorAll('.parameter-block').forEach(block => {
-          const predWrap = block.querySelector('.prediction-wrapper');
-          if (predWrap) {
-            predWrap.style.display = predictionsBtn.classList.contains('active') ? '' : 'none';
-          }
-        });
-        // Графики: history-chart-block
-        document.querySelectorAll('.history-chart-block').forEach(block => {
-          block.style.display = chartsBtn.classList.contains('active') ? '' : 'none';
-        });
-      }
-      // --- Кнопки ---
-      focusBtn.addEventListener('click', function() {
-        if (zenBtn.classList.contains('active')) return;
-        focusBtn.classList.toggle('active');
-        updateParamBlocks();
-      });
       commentsBtn.addEventListener('click', function() {
-        if (zenBtn.classList.contains('active')) return;
-        commentsBtn.classList.toggle('active');
-        updateParamBlocks();
+        const isActive = commentsBtn.classList.toggle('active');
+        document.querySelectorAll('.param-description-block').forEach(block => {
+          block.style.display = isActive ? 'block' : 'none';
+        });
       });
-      predictionsBtn.addEventListener('click', function() {
-        if (zenBtn.classList.contains('active')) return;
-        predictionsBtn.classList.toggle('active');
-        updateParamBlocks();
+      // Для каждого textarea отслеживаем изменения
+      document.querySelectorAll('.param-description-textarea').forEach(textarea => {
+        const paramKey = textarea.closest('.param-description-block').dataset.paramKey;
+        const saveBtn = textarea.parentElement.querySelector('.save-description-btn');
+        const statusDiv = textarea.parentElement.querySelector('.save-description-status');
+        let lastValue = textarea.value;
+        textarea.addEventListener('input', function() {
+          if (textarea.value !== lastValue) {
+            saveBtn.style.display = 'inline-block';
+            statusDiv.style.display = 'none';
+          } else {
+            saveBtn.style.display = 'none';
+          }
+        });
+        saveBtn.addEventListener('click', function() {
+          fetch('/api/set_parameter_description/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key: paramKey, description: textarea.value })
+          })
+          .then(resp => resp.json())
+          .then(data => {
+            if (data.success) {
+              lastValue = textarea.value;
+              saveBtn.style.display = 'none';
+              statusDiv.style.display = 'block';
+              setTimeout(() => { statusDiv.style.display = 'none'; }, 1500);
+            }
+          });
+        });
       });
-      chartsBtn.addEventListener('click', function() {
-        if (zenBtn.classList.contains('active')) return;
-        chartsBtn.classList.toggle('active');
-        updateParamBlocks();
+      // --- Логика для переименования параметра ---
+      document.querySelectorAll('.parameter-block').forEach(block => {
+        const editBtn = block.querySelector('.edit-param-btn');
+        const modal = block.querySelector('.rename-modal');
+        const nameInput = block.querySelector('.rename-param-name');
+        const saveBtn = block.querySelector('.save-rename-btn');
+        const cancelBtn = block.querySelector('.cancel-rename-btn');
+        const errorDiv = block.querySelector('.rename-error');
+        if (!editBtn || !modal) return;
+        editBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          modal.style.display = 'flex';
+          nameInput.value = block.querySelector('.rename-param-name').defaultValue;
+          errorDiv.style.display = 'none';
+        });
+        cancelBtn.addEventListener('click', function() {
+          modal.style.display = 'none';
+        });
+        modal.addEventListener('click', function(e) {
+          if (e.target === modal) modal.style.display = 'none';
+        });
+        saveBtn.addEventListener('click', async function() {
+          const oldKey = block.getAttribute('data-key');
+          const newName = nameInput.value.trim();
+          if (!newName) {
+            errorDiv.textContent = 'Заполните новое название';
+            errorDiv.style.display = 'block';
+            return;
+          }
+          saveBtn.disabled = true;
+          errorDiv.style.display = 'none';
+          try {
+            const resp = await fetch('/api/rename_parameter/', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ old_key: oldKey, new_name: newName })
+            });
+            const data = await resp.json();
+            if (data.success) {
+              window.location.reload();
+            } else {
+              errorDiv.textContent = data.error || 'Ошибка';
+              errorDiv.style.display = 'block';
+            }
+          } catch (e) {
+            errorDiv.textContent = 'Ошибка соединения';
+            errorDiv.style.display = 'block';
+          }
+          saveBtn.disabled = false;
+        });
       });
-      // Инициализация
-      updateParamBlocks();
-      // --- Переключение темы ---
-      const themeBtn = document.getElementById('theme-toggle-btn');
-      function setTheme(theme) {
-        if (theme === 'light') {
-          document.body.classList.add('light-theme');
-          localStorage.setItem('theme', 'light');
-          themeBtn.textContent = '🌞 Тема';
-        } else {
-          document.body.classList.remove('light-theme');
-          localStorage.setItem('theme', 'dark');
-          themeBtn.textContent = '🌗 Тема';
-        }
-      }
-      themeBtn.addEventListener('click', function() {
-        if (document.body.classList.contains('light-theme')) {
-          setTheme('dark');
-        } else {
-          setTheme('light');
-        }
-      });
-      // Инициализация темы при загрузке
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'light') {
-        setTheme('light');
-      } else {
-        setTheme('dark');
-      }
-      // ... остальной JS ...
     });
   </script>
 </body>
