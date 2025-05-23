@@ -536,7 +536,7 @@ async function loadParameterHistory(paramKey, dateStr) {
             const intercept = (sumY - slope * sumX) / n;
             return Array.from({length: n}, (_, i) => Math.round((slope * i + intercept) * 100) / 100);
           })(),
-          borderColor: 'rgba(255,152,0,0.30)',
+          borderColor: 'rgba(0,123,255,1)',
           backgroundColor: 'rgba(255,152,0,0.10)',
           borderWidth: 1,
           borderDash: [5, 5],
