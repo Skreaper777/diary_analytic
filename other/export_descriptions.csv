@@ -1,13 +1,13 @@
 ﻿Ключ,Название,Описание
 eda_molochnoe_end_p3,ЕДА 🍽️ :: Молочное 🥛 :: {end} p3,
-eda-muchnoe-pshenitsa-end,ЕДА 🍽️ :: Мучное (пшеница) 🍞 :: {end},
-eda-sladosti-end,ЕДА 🍽️ :: Сладости 🍬 :: {end},
+eda_muchnoe_pshenitsa_end_p3,ЕДА 🍽️ :: Мучное (пшеница) 🍞 :: {end} p3,
+eda_sladosti_end_p3,ЕДА 🍽️ :: Сладости 🍬 :: {end} p3,
 zhvt-obshch-vzdutie-all-p2,ЖВТ-ОБЩ 🫀 :: Вздутие 🎈 :: {all} p2,
 zhvt-obshch-gazy-all-p2,ЖВТ-ОБЩ 🫀 :: Газы 💨 :: {all} p2,"25.05.23 Ну в целом радует, что в районе 2ух находится. А не 3-4"
 zhvt-obshch-diskomfort-v-zhivote-all-p3,ЖВТ-ОБЩ 🫀 :: Дискомфорт в животе 🤕 :: {all} p3,
 zhvt-obshch-izzhoga-all-p3,ЖВТ-ОБЩ 🫀 :: Изжога 🔥 :: {all} p3,Сидит ровно на 50%. Задолбала. 
-zhvt-obshch-kal-plokhoi-one-p2,ЖВТ-ОБЩ 🫀 :: Кал (плохой) 🟤 :: {one} p2,
-zhvt-pnk-golovokruzhenie-start-p1,ЖВТ-ПНК 🟤 :: Головокружение 🌀 :: {start} p1,"Стабильно уменьшается. Надо ждать. 👍
+zhvt_obshch_kal_plokhoi_end_p2,ЖВТ-ОБЩ 🫀 :: Кал (плохой) 🟤 :: {end} p2,
+zhvt_pnk_golovokruzhenie_start_p2,ЖВТ-ПНК 🟤 :: Головокружение 🌀 :: {start} p2,"Стабильно уменьшается. Надо ждать. 👍
 За последнюю неделю держаться на одном уровне 🤔"
 zhvt-pnk-diareia-end-p3,ЖВТ-ПНК 🟤 :: Диарея 🚽 :: {end} p3,
 zhvt-pnk-zapor-one-p3,ЖВТ-ПНК 🟤 :: Запор 🚽 :: {one} p3,
@@ -18,68 +18,68 @@ zhvt_pnk_fermenty_one_p3_pos_def1,ЖВТ-ПНК 🟤 :: Ферменты 💊 ::
 zdr-zariadka-dfl-def0-p4-pos,ЗДР 💪 :: Зарядка 🏋️ :: {dfl} def0 p4 pos,
 zdr_obektivno_ia_zabolel_one_p3_def0,ЗДР 💪 :: Объективно я заболел 🩺 :: {one} p3 def0,
 zdr-progulka-end-pos,ЗДР 💪 :: Прогулка 🚶 :: {end} pos,
-nrv_mshn_agressiia_za_rulem_one,НРВ-МШН 🚗 :: Агрессия за рулем 🤬 :: {one},Проверка
-nrv-mshn-nervoznost-i-stress-za-rulem-one,НРВ-МШН 🚗 :: Нервозность и стресс за рулем 😠 :: {one},
-nrv-mshn-razdrazhaet-nerviruet-ezda-za-rulem-one,НРВ-МШН 🚗 :: Раздражает (нервирует) езда за рулем 😠 :: {one},
-nrv_mshn_nervoznost_v_doroge_one,НРВ-МШН 🤬 :: Нервозность в дороге 🚗🤬 :: {one},
-obshch-ustalost-k-seredine-dnia-one,ОБЩ 👤 :: Усталость к середине дня 😪 :: {one},
-obshch_ustalost_end,ОБЩ 👤 :: Усталость 😩 :: {end},
+nrv_mshn_agressiia_za_rulem_one_p3,НРВ-МШН 🚗 :: Агрессия за рулем 🤬 :: {one} p3,Проверка
+nrv_mshn_nervoznost_i_stress_za_rulem_one_p3,НРВ-МШН 🚗 :: Нервозность и стресс за рулем 😠 :: {one} p3,
+nrv_mshn_razdrazhaet_nerviruet_ezda_za_rulem_one_p3,НРВ-МШН 🚗 :: Раздражает (нервирует) езда за рулем 😠 :: {one} p3,
+nrv_mshn_nervoznost_v_doroge_one_p3,НРВ-МШН 🤬 :: Нервозность в дороге 🚗 🤬 :: {one} p3,
+obshch_ustalost_k_seredine_dnia_one_p3,ОБЩ 👤 :: Усталость к середине дня 😪 :: {one} p3,25.05.23 в целом хороший результат 👍
+obshch_ustalost_end_p2,ОБЩ 👤 :: Усталость 😩 :: {end} p2,25.05.23 ну от пиковой усталости и я ушел 👍
 prd-mlk-iogurt-dfl-def0-p4,ПРД-МЛК 🥗🥛 :: Йогурт 🍶 :: {dfl} def0 p4,
 prd-mlk-morozhennoe-dfl-def0-p4,ПРД-МЛК 🥗🥛 :: Мороженное 🍦 :: {dfl} def0 p4,
-prd-mlk-syr-all,ПРД-МЛК 🥗🥛 :: Сыр 🧀 :: {all},
-prd-mlk-tvorog-all-def0,ПРД-МЛК 🥗🥛 :: Творог 🍶 :: {all} def0,
-prd-much-vypechka-all-def0,ПРД-МУЧ 🥗🌾 :: Выпечка 🥐 :: {all} def0,
-prd-much-lapsha-dfl-def0,ПРД-МУЧ 🥗🌾 :: Лапша 🍜 :: {dfl} def0,
+prd_mlk_syr_all_p4,ПРД-МЛК 🥗🥛 :: Сыр 🧀 :: {all} p4,
+prd_mlk_tvorog_all_def0_p4,ПРД-МЛК 🥗🥛 :: Творог 🍶 :: {all} def0 p4,
+prd_much_vypechka_all_def0_p4,ПРД-МУЧ 🥗🌾 :: Выпечка 🥐 :: {all} def0 p4,
+prd_much_lapsha_dfl_def0_p4,ПРД-МУЧ 🥗🌾 :: Лапша 🍜 :: {dfl} def0 p4,
 prd-much-pelmeni-dfl-def0-p4,ПРД-МУЧ 🥗🌾 :: Пельмени 🥟 :: {dfl} def0 p4,
-prd-much-pechenia-all,ПРД-МУЧ 🥗🌾 :: Печенья 🍪 :: {all},
+prd_much_pechenia_all_p4,ПРД-МУЧ 🥗🌾 :: Печенья 🍪 :: {all} p4,
 prd-much-pitstsa-dfl-def0-p4,ПРД-МУЧ 🥗🌾 :: Пицца 🍕 :: {dfl} def0 p4,
 prd-mias-plov-end-def0-p4,ПРД-МЯС 🥗 :: Плов :: {end} def0 p4,
 prd-mias-svinina-zharenaia-end-def0-p4,ПРД-МЯС 🥗 :: Свинина жареная 🥩 :: {end} def0 p4,
 prd-mias-shashlyk-end-def0-p4,ПРД-МЯС 🥗 :: Шашлык 🍢 :: {end} def0 p4,
-prd-obshch-zharenaia-ili-zhirnaia-eda-all,ПРД-ОБЩ 🥗 :: Жареная или жирная еда 🍟 :: {all},
-prd_obshch_kofe_end_def1,ПРД-ОБЩ 🥗 :: Кофе ☕ :: {end} def1,
+prd_obshch_zharenaia_ili_zhirnaia_eda_all_p3,ПРД-ОБЩ 🥗 :: Жареная или жирная еда 🍟 :: {all} p3,
+prd_obshch_kofe_end_def1_p4,ПРД-ОБЩ 🥗 :: Кофе ☕ :: {end} def1 p4,
 prd-obshch-ris-dfl-def0-p4,ПРД-ОБЩ 🥗 :: Рис 🍚 :: {dfl} def0 p4,
 prd-ryb-ukha-end-def0-p4,ПРД-РЫБ 🥗 :: Уха :: {end} def0 p4,
-prd-sld-konfety-dfl-def0,ПРД-СЛД 🥗 :: Конфеты 🍬 :: {dfl} def0,
-prd-sld-shokolad-dfl-def0,ПРД-СЛД 🥗 :: Шоколад 🍫 :: {dfl} def0,
+prd_sld_konfety_dfl_def0_p4,ПРД-СЛД 🥗 :: Конфеты 🍬 :: {dfl} def0 p4,
+prd_sld_shokolad_dfl_def0_p4,ПРД-СЛД 🥗 :: Шоколад 🍫 :: {dfl} def0 p4,
 prd-frk-iabloki-dfl-def0-p4,ПРД-ФРК 🥗🍇 :: Яблоки 🍎 :: {dfl} def0 p4,
 pskh-chat-byla-li-podderzhka-ili-dobrota-ot-kogo-to-end-pos,ПСХ-Chat 🧘‍♂️ :: Была ли поддержка или доброта от кого-то? ❤️ :: {end} pos,
 pskh-chat-bylo-li-oshchushchenie-smysla-tsennosti-v-dne-end-pos,ПСХ-Chat 🧘‍♂️ :: Было ли ощущение смысла/ценности в дне? 💡 :: {end} pos,
-pskh-chat-chuvstvo-viny-za-den-end,ПСХ-Chat 🧘‍♂️ :: Чувство вины за день 😞 :: {end},
-pskh-nrv-agressiia-all,ПСХ-НРВ 🤬 :: Агрессия 🤬 :: {all},
-pskh-nrv-dovodiat-deti-end,ПСХ-НРВ 🤬 :: Доводят дети 🧒😤 :: {end},"О каком спокойном и гармоничном состоянии можно думать, если я на столько сильно нервничаю с детьми? ⚠️⁉️"
-pskh-nrv-krichu-na-detei-end,ПСХ-НРВ 🤬 :: Кричу на детей 🧒😤 :: {end},
-pskh-nrv-krichu-na-zhenu-end,ПСХ-НРВ 🤬 :: Кричу на жену 😤 :: {end},
-pskh-nrv-nervoznost-v-obshchem-all-p2,ПСХ-НРВ 🤬 :: Нервозность в общем 😬 :: {all} p2,25.05.23 Я задался целью снизить нервозность. Посмотрим. Пока вроде иду на снижение. 
+pskh_chat_chuvstvo_viny_za_den_end_p1,ПСХ-Chat 🧘‍♂️ :: Чувство вины за день 😞 :: {end} p1,25.05.23 пока что проживаю в сплошном стыде
+pskh_nrv_agressiia_all_p2,ПСХ-НРВ 🤬 :: Агрессия 🤬 :: {all} p2,
+pskh_nrv_dovodiat_deti_end_p2,ПСХ-НРВ 🤬 :: Доводят дети 🧒😤 :: {end} p2,"О каком спокойном и гармоничном состоянии можно думать, если я на столько сильно нервничаю с детьми? ⚠️⁉️"
+pskh_nrv_krichu_na_detei_end_p2,ПСХ-НРВ 🤬 :: Кричу на детей 🧒😤 :: {end} p2,
+pskh_nrv_krichu_na_zhenu_end_def0_p4,ПСХ-НРВ 🤬 :: Кричу на жену 😤 :: {end} def0 p4,
+pskh_nrv_nervoznost_v_obshchem_all_p1,ПСХ-НРВ 🤬 :: Нервозность в общем 😬 :: {all} p1,23.05.25 Я задался целью снизить нервозность. Посмотрим. Пока вроде иду на снижение. 
 pskh_nrv_tiki_nervnye_all_p1,ПСХ-НРВ 🤬 :: Тики Нервные 😵‍💫 :: {all} p1,"Ужасно высокие тики ‼️⛔️⚠️
 И пока нет никах предпосылок к снижению 😪"
-pskh-nst-apatiia-end,ПСХ-НСТ 🧘‍♂️ :: Апатия 😢 :: {end},
-pskh-nst-vypad-iz-kolei-end,ПСХ-НСТ 🧘‍♂️ :: Выпад из колеи 🛑 :: {end},
+pskh_nst_apatiia_end_p2,ПСХ-НСТ 🧘‍♂️ :: Апатия 😢 :: {end} p2,"25.05.23 снижается. Но все равно не приятно, что она присутствует. "
+pskh_nst_vypad_iz_kolei_end_p4,ПСХ-НСТ 🧘‍♂️ :: Выпад из колеи 🛑 :: {end} p4,
 pskh-nst-depressiia-dfl-def0-p4,ПСХ-НСТ 🧘‍♂️ :: Депрессия 🌧️ :: {dfl} def0 p4,
 pskh_nst_udovolstvie_ot_dnia_end_p0_pos,ПСХ-НСТ 🧘‍♂️ :: Удовольствие от дня 👍🏻 :: {end} p0 pos,"Радует, что я получаю удовольствие от дня 👍. Хотя до ведения статистики я бы так и не подумал. "
-pskh-trv-suetlivost-all,ПСХ-ТРВ 🧘‍♂️ :: Суетливость 🤯 :: {all},
-pskh-trv-trevoga-all,ПСХ-ТРВ 🧘‍♂️ :: Тревога 👻 :: {all},
-pskh_enr_zhiznennaia_energiia_all_p0_pos,ПСХ-ЭНР 🧘‍♂️ :: Жизненная энергия 🔋 :: {all} p0 pos,"Не удивительно, что на фоне напряжения, стресса, тревоги жизненная энергия на низком уровне. "
+pskh_trv_suetlivost_all_p3,ПСХ-ТРВ 🧘‍♂️ :: Суетливость 🤯 :: {all} p3,
+pskh_trv_trevoga_all_p2,ПСХ-ТРВ 🧘‍♂️ :: Тревога 👻 :: {all} p2,
+pskh_enr_zhiznennaia_energiia_all_p0_pos,ПСХ-ЭНР 🧘‍♂️ :: Жизненная энергия 🔋 :: {all} p0 pos,"Не удивительно, что на фоне напряжения, стресса, тревоги жизненная энергия на СРЕДНЕМ уровне. "
 pskh-enr-lebido-end-pos,ПСХ-ЭНР 🧘‍♂️ :: Лебидо 💪🏻 :: {end} pos,
 pskh_enr_napriazhenie_all_p0,ПСХ-ЭНР 🧘‍♂️ :: Напряжение ⚡ :: {all} p0,⚠️⛔️‼️А вот тут очень и очень опасно пока. Надо всеми силами снижать напряжение с себя. 
-pskh_enr_nastroenie_end_p0_pos,ПСХ-ЭНР 🧘‍♂️ :: Настроение 🌞 :: {end} p0 pos,"На удивление, в целом, настроение хорошее 😅"
-pskh-enr-pozitiv-v-zhizni-all-p1-pos,ПСХ-ЭНР 🧘‍♂️ :: Позитив в жизни 🌞 :: {all} p1 pos,Нужно находить всеми силами возможность находить в жизни что-то положительное. 
-pskh-enr-slabost-vialost-all,ПСХ-ЭНР 🧘‍♂️ :: Слабость вялость 😔 :: {all},
+pskh_enr_nastroenie_end_p0_pos,ПСХ-ЭНР 🧘‍♂️ :: Настроение 🌞 :: {end} p0 pos,"На удивление, в целом, настроение почти хорошее 😅"
+pskh-enr-pozitiv-v-zhizni-all-p1-pos,ПСХ-ЭНР 🧘‍♂️ :: Позитив в жизни 🌞 :: {all} p1 pos,"25.05.25 Не понимаю как, но позитив за 7 дн. 79% 🤔"
+pskh_enr_slabost_vialost_all_p2,ПСХ-ЭНР 🧘‍♂️ :: Слабость вялость 😔 :: {all} p2,
 rbt-obshch-giperfokus-povyshennaia-nagruzka-all-p3,РБТ-ОБЩ 💼 :: Гиперфокус (повышенная нагрузка) 🎯⚡ :: {all} p3,
 rbt_obshch_effektivnost_v_realnoi_rabote_all_p1_pos,РБТ-ОБЩ 💼 :: Эффективность в реальной работе 📈 :: {all} p1 pos,
-rbt-pskh-dovolen-rezultatom-realnoi-rabotoi-all-p2-pos,РБТ-ПСХ 💼 :: Доволен результатом реальной работой 👍🏻 :: {all} p2 pos,
+rbt_pskh_dovolen_rezultatom_realnoi_rabotoi_all_p1_pos,РБТ-ПСХ 💼 :: Доволен результатом реальной работой 👍🏻 :: {all} p1 pos,
 rbt-pskh-zhelanie-sbezhat-ot-realnykh-trudnostei-all-p3,РБТ-ПСХ 💼 :: Желание сбежать от реальных трудностей 🏃‍♂️👻 :: {all} p3,
 rbt-pskh-komfort-v-realnoi-rabote-all-p3-pos,РБТ-ПСХ 💼 :: Комфорт в реальной работе 😓 :: {all} p3 pos,
 rbt-pskh-prokrastinatsiia-all-p3,РБТ-ПСХ 💼 :: Прокрастинация 😵⏳ :: {all} p3,
-rbt_pskh_razdrazhaet_nerviruet_realnaia_rabota_all_p1,РБТ-ПСХ 💼 :: Раздражает (нервирует) реальная работа 😠 :: {all} p1,
+rbt_pskh_razdrazhaet_nerviruet_otvrashchenie_realnaia_rabota_all_p1,"РБТ-ПСХ 💼 :: Раздражает (нервирует, отвращение) реальная работа 😠 :: {all} p1",
 rbt-pskh-sbezhal-ot-problem-v-realnoi-aktivnosti-end-p3,РБТ-ПСХ 🧘‍♂️ :: Сбежал от проблем в реальной активности 😱 :: {end} p3,
 rbt_pskh_strakh_raboty_end_p1,РБТ-ПСХ 🧘‍♂️ :: Страх работы 😱 :: {end} p1,
 rbt_enr_motivatsiia_i_zhelanie_na_realnuiu_rabotu_all_p1_pos,РБТ-ЭНР 💼 :: Мотивация и желание на реальную работу 🔥 :: {all} p1 pos,
 rbt-enr-poluchil-udovolstvie-ot-realnoi-raboty-all-p2-pos,РБТ-ЭНР 💼 :: Получил удовольствие от реальной работы 🔥 :: {all} p2 pos,
-son-vovremia-leg-spat-start-pos,СОН 🛌 :: Вовремя лег спать 🕜 :: {start} pos,
 son-vysypanie-start-pos,СОН 🛌 :: Высыпание 😴 :: {start} pos,
 son-dlitelnost-sna-start-pos,СОН 🛌 :: Длительность сна 🕜 :: {start} pos,
-son-dnevnoi-son-one,СОН 🛌 :: Дневной сон 😴 :: {one},
+son_dnevnoi_son_one_p3,СОН 🛌 :: Дневной сон 😴 :: {one} p3,
 son-kachestvo-sna-start-pos,СОН 🛌 :: Качество сна 😴 :: {start} pos,
-son-sonlivost-all,СОН 🛌 :: Сонливость 😴 :: {all},
+son_pozdno_leg_spat_start,СОН 🛌 :: Поздно лег спать 🕜 :: {start},
+son_sonlivost_all_p2,СОН 🛌 :: Сонливость 😴 :: {all} p2,
 son-iarkie-sny-start-p4,СОН 🛌 :: Яркие сны 🌈🛌 :: {start} p4,
