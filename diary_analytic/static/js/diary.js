@@ -567,11 +567,25 @@ async function loadParameterHistory(paramKey, dateStr) {
           segment: {
             borderColor: ctx => {
               const v = ctx.p0.parsed.y;
-              return v >= 3 ? '#e0a800' : '#28a745';
+              // Проверяем, содержит ли paramKey "pos" (регистронезависимо)
+              const isPositiveParam = paramKey.toLowerCase().includes('pos');
+              // Инвертируем логику цвета, если параметр "позитивный"
+              if (isPositiveParam) {
+                  return v >= 3 ? '#28a745' : '#e0a800'; // Инвертированный цвет
+              } else {
+                  return v >= 3 ? '#e0a800' : '#28a745'; // Оригинальный цвет
+              }
             },
             backgroundColor: ctx => {
               const v = ctx.p0.parsed.y;
-              return v >= 3 ? 'rgba(224,168,0,0.10)' : 'rgba(40,167,69,0.10)';
+              // Проверяем, содержит ли paramKey "pos" (регистронезависимо)
+              const isPositiveParam = paramKey.toLowerCase().includes('pos');
+              // Инвертируем логику цвета заливки, если параметр "позитивный"
+               if (isPositiveParam) {
+                  return v >= 3 ? 'rgba(40,167,69,0.10)' : 'rgba(224,168,0,0.10)'; // Инвертированная заливка
+               } else {
+                  return v >= 3 ? 'rgba(224,168,0,0.10)' : 'rgba(40,167,69,0.10)'; // Оригинальная заливка
+               }
             }
           }
         },
