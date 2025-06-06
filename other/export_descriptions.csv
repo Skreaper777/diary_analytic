@@ -1,14 +1,14 @@
 ﻿Ключ,Название,Описание
 eda_obshch_pnk_obshchee_kolichestvo_edy_obzhorstvo_end_p2,ЕДА-ОБЩ-ПНК :: Общее количество еды (обжорство) 🥙 :: {end} p2,
-eda_pnk_molochnoe_end_p3,ЕДА-ПНК 🍽️ :: Молочное 🥛 :: {end} p3,
+eda_pnk_molochnoe_end_def0_p3,ЕДА-ПНК 🍽️ :: Молочное 🥛 :: {end} def0 p3,
 eda_pnk_muchnoe_pshenitsa_end_p3,ЕДА-ПНК 🍽️ :: Мучное (пшеница) 🍞 :: {end} p3,
 eda_pnk_sladosti_end_p3,ЕДА-ПНК 🍽️ :: Сладости 🍬 :: {end} p3,
 zhvt-obshch-vzdutie-all-p2,ЖВТ-ОБЩ 🫀 :: Вздутие 🎈 :: {all} p2,
 zhvt-obshch-gazy-all-p2,ЖВТ-ОБЩ 🫀 :: Газы 💨 :: {all} p2,"30.05 Поднялось до 4х. Началось после срыва панкреатита 26.05
 23.05.25 Ну в целом радует, что в районе 2ух находится. А не 3-4"
 zhvt-obshch-diskomfort-v-zhivote-all-p3,ЖВТ-ОБЩ 🫀 :: Дискомфорт в животе 🤕 :: {all} p3,
-zhvt_obshch_kal_plokhoi_end_p2,ЖВТ-ОБЩ 🫀 :: Кал (плохой) 🟤 :: {end} p2,
 zhvt_obshch_pnk_izzhoga_all_p3,ЖВТ-ОБЩ-ПНК 🫀 :: Изжога 🔥 :: {all} p3,Сидит ровно на 50%. Задолбала. 
+zhvt_obshch_pnk_kal_plokhoi_end_p2,ЖВТ-ОБЩ-ПНК 🫀 :: Кал (плохой) 🟤 :: {end} p2,
 zhvt_pnk_kozhnaia_allergiia_p4_def0,ЖВТ-ПНК :: Кожная аллергия :: {} p4 def0,
 zhvt_pnk_golovokruzhenie_end_p2,ЖВТ-ПНК 🟤 :: Головокружение 🌀 :: {end} p2,"Стабильно уменьшается. Надо ждать. 👍
 За последнюю неделю держаться на одном уровне 🤔"
@@ -19,7 +19,7 @@ zhvt_pnk_pankreatit_meshaet_rabotat_one_def0_p1,ЖВТ-ПНК 🟤 :: Панкр
 zhvt_pnk_toshnota_end_def0_p4,ЖВТ-ПНК 🟤 :: Тошнота 🤮 :: {end} def0 p4,
 zhvt_pnk_fermenty_one_pos_def1_p4,ЖВТ-ПНК 🟤 :: Ферменты 💊 :: {one} pos def1 p4,
 zdr_nepriiatnye_oshchushcheniia_v_spine_end_def0_p3,ЗДР :: Неприятные ощущения в спине :: {end} def0 p3,
-zdr_zariadka_def0_p4_pos,ЗДР 💪 :: Зарядка 🏋️ :: {} def0 p4 pos,
+zdr_zariadka_end_def0_p4_pos,ЗДР 💪 :: Зарядка 🏋️ :: {end} def0 p4 pos,
 zdr_obektivno_ia_zabolel_v_osnovnom_prostuda_p3_def0,ЗДР 💪 :: Объективно я заболел (в основном простуда) 🩺 :: {} p3 def0,
 zdr_progulka_end_pos_p3,ЗДР 💪 :: Прогулка 🚶 :: {end} pos p3,
 mshn_obshch_ezda_na_mashine_end_p3,МШН-ОБЩ 🚗 :: Езда на машине :: {end} p3,
@@ -47,11 +47,11 @@ obshch_pskh_enr_otd_ust_ustalost_k_kontsu_dnia_end_p1,ОБЩ-ПСХ-ЭНР-ОТ�
 prd_mlk_morozhennoe_def0_p4,ПРД-МЛК 🥗🥛 :: Мороженное 🍦 :: {} def0 p4,
 prd_mlk_pnk_iogurt_def0_p4,ПРД-МЛК-ПНК 🥗🥛 :: Йогурт 🍶 :: {} def0 p4,
 prd_mlk_pnk_syr_all_def0_p3,ПРД-МЛК-ПНК 🥗🥛 :: Сыр 🧀 :: {all} def0 p3,
-prd_mlk_pnk_tvorog_all_def0_p3,ПРД-МЛК-ПНК 🥗🥛 :: Творог 🍶 :: {all} def0 p3,
+prd_mlk_pnk_tvorog_all_def0_p4,ПРД-МЛК-ПНК 🥗🥛 :: Творог 🍶 :: {all} def0 p4,
 prd_much_lapsha_end_def0_p3,ПРД-МУЧ 🥗🌾 :: Лапша 🍜 :: {end} def0 p3,
 prd_much_pelmeni_def0_p4,ПРД-МУЧ 🥗🌾 :: Пельмени 🥟 :: {} def0 p4,
 prd_much_pitstsa_def0_p4,ПРД-МУЧ 🥗🌾 :: Пицца 🍕 :: {} def0 p4,
-prd_much_pnk_vypechka_all_def0_p3,ПРД-МУЧ-ПНК 🥗🌾 :: Выпечка 🥐 :: {all} def0 p3,
+prd_much_pnk_vypechka_bulochki_all_def0_p3,ПРД-МУЧ-ПНК 🥗🌾 :: Выпечка (булочки) 🥐 :: {all} def0 p3,
 prd_much_pnk_pechenia_all_def0_p3,ПРД-МУЧ-ПНК 🥗🌾 :: Печенья 🍪 :: {all} def0 p3,
 prd_mias_plov_def0_p4,ПРД-МЯС 🥗 :: Плов :: {} def0 p4,
 prd_mias_shashlyk_def0_p4,ПРД-МЯС 🥗 :: Шашлык 🍢 :: {} def0 p4,
@@ -59,9 +59,10 @@ prd_mias_pnk_svinina_zharenaia_def0_p4,ПРД-МЯС-ПНК 🥗 :: Свинин
 prd_obshch_ovoshchi_svezhie_end_pos_def0_p3,ПРД-ОБЩ :: Овощи свежие 🥗 :: {end} pos def0 p3,
 prd_obshch_ris_all_def0_p3,ПРД-ОБЩ 🥗 :: Рис 🍚 :: {all} def0 p3,
 prd_obshch_pnk_zharenaia_ili_zhirnaia_eda_all_p3,ПРД-ОБЩ-ПНК 🥗 :: Жареная или жирная еда 🍟 :: {all} p3,
-prd_obshch_pnk_kofe_end_def1_p3,ПРД-ОБЩ-ПНК 🥗 :: Кофе ☕ :: {end} def1 p3,
+prd_obshch_pnk_kofe_end_def0_p3,ПРД-ОБЩ-ПНК 🥗 :: Кофе ☕ :: {end} def0 p3,
 prd_ryb_ukha_def0_p4,ПРД-РЫБ 🥗 :: Уха :: {} def0 p4,
 prd_sld_pnk_konfety_end_def0_p4,ПРД-СЛД-ПНК 🥗 :: Конфеты 🍬 :: {end} def0 p4,
+prd_sld_pnk_sneki_end_def0_p3,ПРД-СЛД-ПНК 🥗 :: Снеки  :: {end} def0 p3,
 prd_sld_pnk_shokolad_end_def0_p4,ПРД-СЛД-ПНК 🥗 :: Шоколад 🍫 :: {end} def0 p4,
 prd_frk_iabloki_def0_p4,ПРД-ФРК 🥗🍇 :: Яблоки 🍎 :: {} def0 p4,
 pskh_chat_byla_li_podderzhka_ili_dobrota_ot_kogo_to_end_pos_p1,ПСХ-Chat 🧘‍♂️ :: Была ли поддержка или доброта от кого-то? ❤️ :: {end} pos p1,
