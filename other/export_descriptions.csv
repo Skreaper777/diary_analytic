@@ -19,7 +19,7 @@ zhvt_pnk_pankreatit_meshaet_rabotat_one_def0_p1,ЖВТ-ПНК 🟤 :: Панкр
 zhvt_pnk_toshnota_end_def0_p4,ЖВТ-ПНК 🟤 :: Тошнота 🤮 :: {end} def0 p4,
 zhvt_pnk_fermenty_one_pos_def1_p4,ЖВТ-ПНК 🟤 :: Ферменты 💊 :: {one} pos def1 p4,
 zdr_nepriiatnye_oshchushcheniia_v_spine_end_def0_p3,ЗДР :: Неприятные ощущения в спине :: {end} def0 p3,
-zdr_zariadka_end_def0_p4_pos,ЗДР 💪 :: Зарядка 🏋️ :: {end} def0 p4 pos,
+zdr_zariadka_start_def0_p4_pos,ЗДР 💪 :: Зарядка 🏋️ :: {start} def0 p4 pos,
 zdr_obektivno_ia_zabolel_v_osnovnom_prostuda_p3_def0,ЗДР 💪 :: Объективно я заболел (в основном простуда) 🩺 :: {} p3 def0,
 zdr_progulka_end_pos_p3,ЗДР 💪 :: Прогулка 🚶 :: {end} pos p3,
 mshn_obshch_ezda_na_mashine_end_p3,МШН-ОБЩ 🚗 :: Езда на машине :: {end} p3,
